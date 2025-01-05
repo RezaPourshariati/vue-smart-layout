@@ -1,18 +1,19 @@
 <script setup lang="ts">
-import { computed, defineAsyncComponent } from 'vue'
+import { computed } from 'vue'
 import { useRoute } from 'vue-router'
+import { layoutMap, defaultLayout } from '@/layouts'
 
 const route = useRoute()
 
-const defaultLayout = 'AppLayoutDefault'
+// const defaultLayout = 'AppLayoutDefault'
 
-// Define an explicit mapping for layouts
-const layoutMap = {
-  AppLayoutDefault: defineAsyncComponent(() => import('@/layouts/AppLayoutDefault.vue')),
-  AppLayoutHome: defineAsyncComponent(() => import('@/layouts/AppLayoutHome.vue')),
-  AppLayoutAbout: defineAsyncComponent(() => import('@/layouts/AppLayoutAbout.vue')),
-  AppLayoutContacts: defineAsyncComponent(() => import('@/layouts/AppLayoutContacts.vue')),
-}
+// // Define an explicit mapping for layouts
+// const layoutMap = {
+//   AppLayoutDefault: defineAsyncComponent(() => import('@/layouts/AppLayoutDefault.vue')),
+//   AppLayoutHome: defineAsyncComponent(() => import('@/layouts/AppLayoutHome.vue')),
+//   AppLayoutAbout: defineAsyncComponent(() => import('@/layouts/AppLayoutAbout.vue')),
+//   AppLayoutContacts: defineAsyncComponent(() => import('@/layouts/AppLayoutContacts.vue')),
+// }
 
 // Computed property to determine the active layout
 const layout = computed(() => {
@@ -47,7 +48,16 @@ const layout = computed(() => {
 </script>
 
 <template>
-  <component :is="layout">
-    <slot />
-  </component>
+  <div>
+    <Suspense>
+      <template #default>
+        <component :is="layout">
+          <slot />
+        </component>
+      </template>
+      <template #fallback>
+        <p>Loading layout...</p>
+      </template>
+    </Suspense>
+  </div>
 </template>

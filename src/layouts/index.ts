@@ -1,10 +1,11 @@
 import { defineAsyncComponent } from 'vue'
 
-const layoutMap = {
-  AppLayoutDefault: () => defineAsyncComponent(() => import('@/layouts/AppLayoutDefault.vue')),
-  AppLayoutHome: () => defineAsyncComponent(() => import('@/layouts/AppLayoutHome.vue')),
-  AppLayoutAbout: () => defineAsyncComponent(() => import('@/layouts/AppLayoutAbout.vue')),
-  AppLayoutContacts: () => defineAsyncComponent(() => import('@/layouts/AppLayoutContacts.vue')),
+export const layoutMap = {
+  AppLayoutDefault: defineAsyncComponent(() => import('./AppLayoutDefault.vue')),
+  AppLayoutHome: defineAsyncComponent(() => import('./AppLayoutHome.vue')),
+  AppLayoutAbout: defineAsyncComponent(() => import('./AppLayoutAbout.vue')),
+  AppLayoutContacts: defineAsyncComponent(() => import('./AppLayoutContacts.vue')),
 }
 
-export default layoutMap
+export const defaultLayout = 'AppLayoutDefault'
+
