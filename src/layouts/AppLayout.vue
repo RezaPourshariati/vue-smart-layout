@@ -5,16 +5,6 @@ import { layoutMap, defaultLayout } from '@/layouts'
 
 const route = useRoute()
 
-// const defaultLayout = 'AppLayoutDefault'
-
-// // Define an explicit mapping for layouts
-// const layoutMap = {
-//   AppLayoutDefault: defineAsyncComponent(() => import('@/layouts/AppLayoutDefault.vue')),
-//   AppLayoutHome: defineAsyncComponent(() => import('@/layouts/AppLayoutHome.vue')),
-//   AppLayoutAbout: defineAsyncComponent(() => import('@/layouts/AppLayoutAbout.vue')),
-//   AppLayoutContacts: defineAsyncComponent(() => import('@/layouts/AppLayoutContacts.vue')),
-// }
-
 // Computed property to determine the active layout
 const layout = computed(() => {
   const layoutName = route.meta.layout as string || defaultLayout
@@ -25,26 +15,6 @@ const layout = computed(() => {
     return layoutMap[defaultLayout]
   }
 })
-
-
-// watch(
-//   () => route.meta.layout,
-//   async (layoutName) => {
-//     if (!layoutName) {
-//       layout.value = AppLayoutDefault
-//       return
-//     }
-//
-//     try {
-//       const component = await import(`@/layouts/${layoutName}.vue`)
-//       layout.value = component.default
-//     } catch (e) {
-//       layout.value = AppLayoutDefault
-//       console.error('Failed to resolve module:', e.message)
-//     }
-//   },
-//   { immediate: true }
-// )
 </script>
 
 <template>
@@ -56,7 +26,7 @@ const layout = computed(() => {
         </component>
       </template>
       <template #fallback>
-        <p>Loading layout...</p>
+        <h4>Loading layout...</h4>
       </template>
     </Suspense>
   </div>
