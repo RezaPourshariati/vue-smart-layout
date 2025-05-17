@@ -1,21 +1,22 @@
 <script setup lang="ts">
 import AppLayout from "@/layouts/AppLayout.vue"
+import '@/assets/styles/main.scss'
 </script>
 
 <template>
-  <div id="app">
+  <div class="app">
     <AppLayout>
       <router-view />
     </AppLayout>
   </div>
 </template>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+<style lang="scss">
+.app {
+  font-family: $font-family-base;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
+  color: $text-color;
 }
 </style>

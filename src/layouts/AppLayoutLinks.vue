@@ -1,27 +1,56 @@
 <script setup lang="ts">
+import { RouterLink } from 'vue-router'
 </script>
 
 <template>
-  <div id="nav">
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link> |
-    <router-link to="/contacts">Contacts</router-link> |
-    <router-link to="/test">Test</router-link>
-  </div>
+  <nav id="nav">
+    <RouterLink to="/">Home</RouterLink>|
+    <RouterLink to="/about">About</RouterLink>|
+    <RouterLink to="/contacts">Contacts</RouterLink>|
+    <RouterLink to="/test">Test</RouterLink>
+  </nav>
 </template>
 
-<style scoped>
-
+<style lang="scss" scoped>
 #nav {
-  padding: 30px;
-}
+  padding: $spacing-sm;
+  background-color: lighten($primary-color, 10%);
 
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
+  a {
+    color: white;
+    text-decoration: none;
+    padding: $spacing-xs $spacing-sm;
+    margin: 0 $spacing-xs;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
 
-#nav a.router-link-exact-active {
-  color: #42b983;
+    &:hover {
+      background-color: rgba(white, 0.1);
+    }
+
+    &.router-link-active {
+      background-color: $secondary-color;
+    }
+  }
+
+  @include responsive(sm) {
+    padding: $spacing-md;
+
+    a {
+      padding: $spacing-sm $spacing-md;
+      margin: 0 $spacing-sm;
+      font-size: 1.1em;
+    }
+  }
+
+  @include responsive(md) {
+    padding: $spacing-lg;
+
+    a {
+      padding: $spacing-md $spacing-lg;
+      margin: 0 $spacing-md;
+      font-size: 1.2em;
+    }
+  }
 }
 </style>
