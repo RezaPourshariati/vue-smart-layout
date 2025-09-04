@@ -1,0 +1,199 @@
+// ==========================================================================
+// BUTTON COMPONENTS
+// ==========================================================================
+
+@use '../abstracts' as *;
+@use 'sass:color';
+
+// ✅ Use TailwindCSS classes directly in HTML instead of these legacy classes:
+//
+// BUTTON EXAMPLES:
+// <button class="inline-flex items-center justify-center px-4 py-2 border-0 rounded-md font-medium text-white bg-emerald-600 hover:bg-emerald-700 transition-all disabled:opacity-60">
+//   Primary Button
+// </button>
+
+.btn {
+  // ✅ Base button styles (prefer TailwindCSS classes in HTML)
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: $border-radius-md;
+  font-weight: $font-weight-medium;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all $transition-base;
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  // Button sizes (prefer TailwindCSS: px-3 py-2, px-4 py-3, etc.)
+  &.btn-sm {
+    padding: $spacing-2 $spacing-3;
+    font-size: $font-size-sm;
+  }
+  
+  &.btn-base {
+    padding: $spacing-3 $spacing-4;
+    font-size: $font-size-base;
+  }
+  
+  &.btn-lg {
+    padding: $spacing-4 $spacing-6;
+    font-size: $font-size-lg;
+  }
+  
+  &.btn-xl {
+    padding: $spacing-5 $spacing-8;
+    font-size: $font-size-xl;
+  }
+}
+
+// Button variants (prefer TailwindCSS: bg-emerald-600 hover:bg-emerald-700, etc.)
+.btn-primary {
+  background-color: $color-primary;
+  color: $color-white;
+  
+  &:hover:not(:disabled) {
+    background-color: $color-primary-dark;
+  }
+}
+
+.btn-secondary {
+  background-color: $color-secondary;
+  color: $color-white;
+  
+  &:hover:not(:disabled) {
+    background-color: $color-secondary-dark;
+  }
+}
+
+.btn-success {
+  background-color: $color-success;
+  color: $color-white;
+  
+  &:hover:not(:disabled) {
+    background-color: color.adjust($color-success, $lightness: -10%);
+  }
+}
+
+.btn-warning {
+  background-color: $color-warning;
+  color: $color-text-primary;
+  
+  &:hover:not(:disabled) {
+    background-color: color.adjust($color-warning, $lightness: -10%);
+  }
+}
+
+.btn-danger {
+  background-color: $color-danger;
+  color: $color-white;
+  
+  &:hover:not(:disabled) {
+    background-color: color.adjust($color-danger, $lightness: -10%);
+  }
+}
+
+.btn-info {
+  background-color: $color-info;
+  color: $color-white;
+  
+  &:hover:not(:disabled) {
+    background-color: color.adjust($color-info, $lightness: -10%);
+  }
+}
+
+.btn-outline-primary {
+  background: transparent;
+  color: $color-primary;
+  border: 2px solid $color-primary;
+  
+  &:hover:not(:disabled) {
+    background: $color-primary;
+    color: $color-white;
+  }
+}
+
+.btn-outline-secondary {
+  background: transparent;
+  color: $color-secondary;
+  border: 2px solid $color-secondary;
+  
+  &:hover:not(:disabled) {
+    background: $color-secondary;
+    color: $color-white;
+  }
+}
+
+.btn-ghost {
+  background: transparent;
+  color: $color-text-primary;
+  border: 1px solid transparent;
+  
+  &:hover:not(:disabled) {
+    background: $color-gray-100;
+  }
+}
+
+// Button groups
+.btn-group {
+  display: inline-flex;
+  
+  .btn {
+    border-radius: 0;
+    
+    &:first-child {
+      border-top-left-radius: $border-radius-md;
+      border-bottom-left-radius: $border-radius-md;
+    }
+    
+    &:last-child {
+      border-top-right-radius: $border-radius-md;
+      border-bottom-right-radius: $border-radius-md;
+    }
+    
+    &:not(:last-child) {
+      border-right: none;
+    }
+  }
+}
+
+// Icon buttons
+.btn-icon {
+  padding: $spacing-2;
+  width: auto;
+  height: auto;
+  min-width: 2.5rem;
+  min-height: 2.5rem;
+  
+  &.btn-sm {
+    min-width: 2rem;
+    min-height: 2rem;
+    padding: $spacing-1;
+  }
+  
+  &.btn-lg {
+    min-width: 3rem;
+    min-height: 3rem;
+    padding: $spacing-3;
+  }
+}
+
+// Floating action button
+.btn-fab {
+  @extend .btn-icon;
+  border-radius: 50%;
+  box-shadow: $shadow-lg;
+  position: fixed;
+  bottom: $spacing-8;
+  right: $spacing-8;
+  z-index: $z-index-fixed;
+  
+  &:hover {
+    box-shadow: $shadow-xl;
+    transform: translateY(-2px);
+  }
+}

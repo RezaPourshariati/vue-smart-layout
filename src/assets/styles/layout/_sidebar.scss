@@ -1,0 +1,128 @@
+// ==========================================================================
+// SIDEBAR LAYOUTS
+// ==========================================================================
+
+@use '../abstracts' as *;
+@use 'sass:color';
+
+.layout-sidebar {
+  background: $color-background;
+  border-right: 1px solid $color-border;
+  transition: width $transition-base;
+  position: relative;
+  overflow: hidden;
+  height: 100%;
+  
+  &.sidebar-right {
+    border-right: none;
+    border-left: 1px solid $color-border;
+  }
+  
+  &.sidebar-collapsed {
+    .sidebar-content {
+      padding: $spacing-2;
+    }
+    
+    .sidebar-title,
+    .nav-text {
+      display: none;
+    }
+  }
+}
+
+.sidebar-content {
+  padding: $spacing-4;
+  height: 100%;
+  overflow-y: auto;
+  
+  @include respond-down(md) {
+    padding: $spacing-3;
+  }
+}
+
+.sidebar-section {
+  margin-bottom: $spacing-8;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.sidebar-title {
+  font-size: $font-size-base;
+  font-weight: $font-weight-semibold;
+  margin-bottom: $spacing-4;
+  color: $color-text-primary;
+}
+
+// Sidebar variants
+.sidebar-navigation {
+  background: $color-gray-50;
+  border-right-color: $color-gray-200;
+}
+
+.sidebar-filters {
+  background: color.adjust($color-warning, $lightness: 45%);
+  border-right-color: color.adjust($color-warning, $lightness: 30%);
+}
+
+.sidebar-info {
+  background: color.adjust($color-info, $lightness: 45%);
+  border-right-color: color.adjust($color-info, $lightness: 30%);
+}
+
+// Collapse button
+.collapse-button {
+  position: absolute;
+  top: $spacing-4;
+  right: $spacing-2;
+  background: $color-gray-100;
+  border: 1px solid $color-border;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  // ✅ Use TailwindCSS classes directly in HTML: flex items-center justify-center
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: all $transition-base;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  
+  &:hover {
+    background: $color-gray-200;
+    color: $color-text-primary;
+  }
+  
+  @include respond-down(md) {
+    display: none;
+  }
+}
+
+// Mobile sidebar
+@include respond-down(md) {
+  .layout-sidebar {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    width: 280px;
+    height: 100vh;
+    z-index: $z-index-modal;
+    transition: left $transition-base;
+    box-shadow: $shadow-xl;
+    
+    &.sidebar-open {
+      left: 0;
+    }
+    
+    &.sidebar-right {
+      left: auto;
+      right: -100%;
+      
+      &.sidebar-open {
+        right: 0;
+      }
+    }
+  }
+}

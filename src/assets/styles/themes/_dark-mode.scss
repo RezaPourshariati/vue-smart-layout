@@ -1,0 +1,99 @@
+// ==========================================================================
+// DARK MODE THEMING SYSTEM
+// ==========================================================================
+
+@use '../abstracts/variables' as *;
+
+// Dark mode theme variables
+:root {
+  // Light mode (default)
+  --theme-bg-primary: #{$color-white};
+  --theme-bg-secondary: #{$color-gray-50};
+  --theme-bg-tertiary: #{$color-gray-100};
+  
+  --theme-text-primary: #{$color-gray-900};
+  --theme-text-secondary: #{$color-gray-600};
+  --theme-text-muted: #{$color-gray-500};
+  
+  --theme-border-primary: #{$color-gray-200};
+  --theme-border-secondary: #{$color-gray-300};
+  
+  --theme-shadow: rgba(0, 0, 0, 0.1);
+  --theme-shadow-lg: rgba(0, 0, 0, 0.15);
+}
+
+// Dark mode overrides
+[data-theme="dark"] {
+  --theme-bg-primary: #{$color-gray-900};
+  --theme-bg-secondary: #{$color-gray-800};
+  --theme-bg-tertiary: #{$color-gray-700};
+  
+  --theme-text-primary: #{$color-gray-100};
+  --theme-text-secondary: #{$color-gray-300};
+  --theme-text-muted: #{$color-gray-400};
+  
+  --theme-border-primary: #{$color-gray-700};
+  --theme-border-secondary: #{$color-gray-600};
+  
+  --theme-shadow: rgba(0, 0, 0, 0.3);
+  --theme-shadow-lg: rgba(0, 0, 0, 0.4);
+}
+
+// System preference detection
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --theme-bg-primary: #{$color-gray-900};
+    --theme-bg-secondary: #{$color-gray-800};
+    --theme-bg-tertiary: #{$color-gray-700};
+    
+    --theme-text-primary: #{$color-gray-100};
+    --theme-text-secondary: #{$color-gray-300};
+    --theme-text-muted: #{$color-gray-400};
+    
+    --theme-border-primary: #{$color-gray-700};
+    --theme-border-secondary: #{$color-gray-600};
+    
+    --theme-shadow: rgba(0, 0, 0, 0.3);
+    --theme-shadow-lg: rgba(0, 0, 0, 0.4);
+  }
+}
+
+// Theme-aware component classes
+.theme-card {
+  background-color: var(--theme-bg-primary);
+  border: 1px solid var(--theme-border-primary);
+  box-shadow: 0 1px 3px var(--theme-shadow);
+  color: var(--theme-text-primary);
+}
+
+.theme-card-secondary {
+  background-color: var(--theme-bg-secondary);
+  border: 1px solid var(--theme-border-secondary);
+  color: var(--theme-text-primary);
+}
+
+// Complex theming that TailwindCSS can't handle easily
+.glassmorphism {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  
+  [data-theme="dark"] & {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, $color-primary, $color-accent);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  
+  [data-theme="dark"] & {
+    background: linear-gradient(135deg, $color-primary-light, $color-accent-light);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}

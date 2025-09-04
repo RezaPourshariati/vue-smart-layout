@@ -1,0 +1,184 @@
+// ==========================================================================
+// PROFILE PAGE STYLES
+// ==========================================================================
+
+@use '../abstracts' as *;
+
+.profile {
+  max-width: 800px;
+  
+  .profile-header {
+    display: flex;
+    align-items: center;
+    gap: $spacing-8;
+    margin-bottom: $spacing-12;
+    padding: $spacing-8;
+    background: linear-gradient(135deg, $color-primary 0%, $color-secondary 100%);
+    border-radius: $border-radius-xl;
+    color: $color-white;
+    
+    @include respond-down(md) {
+      flex-direction: column;
+      text-align: center;
+      gap: $spacing-6;
+      padding: $spacing-6;
+    }
+  }
+  
+  .profile-avatar {
+    flex-shrink: 0;
+    
+    img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 4px solid rgba($color-white, 0.3);
+      object-fit: cover;
+      
+      @include respond-down(md) {
+        width: 100px;
+        height: 100px;
+      }
+    }
+  }
+  
+  .profile-info {
+    h1 {
+      margin: 0 0 $spacing-2 0;
+      font-size: $font-size-3xl;
+      font-weight: $font-weight-extrabold;
+      
+      @include respond-to(md) {
+        font-size: $font-size-4xl;
+      }
+      
+      @include respond-down(md) {
+        font-size: $font-size-2xl;
+      }
+    }
+    
+    .profile-title {
+      margin: 0 0 $spacing-2 0;
+      font-size: $font-size-lg;
+      opacity: 0.9;
+      
+      @include respond-to(md) {
+        font-size: $font-size-xl;
+      }
+    }
+    
+    .profile-location {
+      margin: 0;
+      opacity: 0.8;
+    }
+  }
+  
+  .profile-content {
+    // ✅ Use TailwindCSS classes directly: flex flex-col gap-8
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-8;
+  }
+  
+  .profile-section {
+    // ✅ Use TailwindCSS classes directly: bg-white border border-gray-200 rounded-md p-8 shadow-sm
+    background: $color-white;
+    border: 1px solid $color-gray-200;
+    border-radius: $border-radius-md;
+    padding: $spacing-8;
+    box-shadow: $shadow-sm;
+    
+    @include respond-down(md) {
+      padding: $spacing-6;
+    }
+    
+    h2 {
+      margin: 0 0 $spacing-6 0;
+      color: $color-text-primary;
+      font-size: $font-size-xl;
+      border-bottom: 2px solid $color-primary;
+      padding-bottom: $spacing-2;
+      
+      @include respond-to(md) {
+        font-size: $font-size-2xl;
+      }
+    }
+  }
+  
+  .skills-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-3;
+    
+    .skill-tag {
+      background: $color-primary;
+      color: $color-white;
+      padding: $spacing-2 $spacing-4;
+      border-radius: $border-radius-full;
+      font-size: $font-size-sm;
+      font-weight: $font-weight-medium;
+    }
+  }
+  
+  .projects-list {
+    // ✅ Use TailwindCSS classes directly: flex flex-col gap-6
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-6;
+    
+    .project-card {
+      border: 1px solid $color-border;
+      border-radius: $border-radius-md;
+      padding: $spacing-6;
+      transition: transform $transition-base;
+      
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: $shadow-md;
+      }
+      
+      h3 {
+        margin: 0 0 $spacing-2 0;
+        color: $color-text-primary;
+      }
+      
+      p {
+        margin: 0 0 $spacing-4 0;
+        color: $color-text-secondary;
+        line-height: $line-height-relaxed;
+      }
+    }
+  }
+  
+  .project-tech {
+    display: flex;
+    gap: $spacing-2;
+    flex-wrap: wrap;
+    
+    span {
+      background: $color-background-muted;
+      color: $color-text-primary;
+      padding: $spacing-1 $spacing-3;
+      border-radius: $border-radius-base;
+      font-size: $font-size-xs;
+      border: 1px solid $color-border;
+    }
+  }
+  
+  .contact-info {
+    display: grid;
+    gap: $spacing-4;
+    
+    .contact-item {
+      padding: $spacing-3;
+      background: $color-background-secondary;
+      border-radius: $border-radius-md;
+      border-left: 4px solid $color-primary;
+      
+      strong {
+        color: $color-text-primary;
+        margin-right: $spacing-2;
+      }
+    }
+  }
+}

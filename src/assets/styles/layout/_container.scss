@@ -1,0 +1,35 @@
+// ==========================================================================
+// CONTAINER (Now using TailwindCSS)
+// ==========================================================================
+
+@use '../abstracts' as *;
+
+// ✅ TailwindCSS handles containers better - use these classes instead:
+// - .container (with mx-auto px-4)
+// - .max-w-sm, .max-w-md, .max-w-lg, .max-w-xl, .max-w-2xl, etc.
+
+// ✅ Use TailwindCSS classes directly in your HTML instead:
+//
+// EXAMPLES:
+// <div class="container mx-auto px-4">           <!-- Standard container -->
+// <div class="max-w-sm mx-auto px-4">           <!-- Small container -->
+// <div class="max-w-md mx-auto px-4">           <!-- Medium container -->
+// <div class="max-w-lg mx-auto px-4">           <!-- Large container -->
+// <div class="max-w-xl mx-auto px-4">           <!-- Extra large container -->
+// <div class="max-w-2xl mx-auto px-4">          <!-- 2XL container -->
+// <div class="w-full px-4">                     <!-- Fluid container -->
+
+// Legacy support (if absolutely needed - prefer TailwindCSS classes)
+.container-custom {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.container-fluid {
+  width: 100%;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}

@@ -1,0 +1,92 @@
+// ==========================================================================
+// HEADER LAYOUTS
+// ==========================================================================
+
+@use '../abstracts' as *;
+
+.layout-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  transition: all $transition-base;
+  position: relative;
+  z-index: $z-index-sticky;
+  
+  .header-content {
+    // ✅ Use TailwindCSS classes directly in HTML: container mx-auto px-4 flex items-center justify-between
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+// Header variants
+.header-minimal {
+  height: 3rem;
+  border-bottom: 1px solid $color-border;
+  background-color: $color-background;
+  
+  @include respond-to(md) {
+    height: 3.5rem;
+  }
+}
+
+.header-standard {
+  height: 4rem;
+  box-shadow: $shadow-sm;
+  background-color: $color-background;
+  
+  @include respond-to(md) {
+    height: 5rem;
+  }
+}
+
+.header-hero {
+  min-height: 6rem;
+  background: linear-gradient(135deg, $color-primary 0%, $color-secondary 100%);
+  color: $color-white;
+  
+  @include respond-to(md) {
+    min-height: 8rem;
+  }
+  
+  @include respond-to(lg) {
+    min-height: 12rem;
+  }
+}
+
+.header-transparent {
+  background: rgba($color-background, 0.9);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba($color-border, 0.3);
+}
+
+// Header title
+.header-title {
+  margin: 0;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: inherit;
+  
+  @include respond-to(md) {
+    font-size: $font-size-xl;
+  }
+  
+  .header-hero & {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+    color: $color-white;
+    
+    @include respond-to(md) {
+      font-size: $font-size-3xl;
+    }
+    
+    @include respond-to(lg) {
+      font-size: $font-size-4xl;
+    }
+  }
+}

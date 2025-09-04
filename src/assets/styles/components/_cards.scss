@@ -1,0 +1,167 @@
+// ==========================================================================
+// CARD COMPONENTS
+// ==========================================================================
+
+@use '../abstracts' as *;
+
+.card {
+  // ✅ Use TailwindCSS classes directly in HTML: bg-white border border-gray-200 rounded-md p-6 shadow-sm
+  background: $color-white;
+  border: 1px solid $color-gray-200;
+  border-radius: $border-radius-md;
+  padding: $spacing-6;
+  box-shadow: $shadow-sm;
+  
+  &.card-hover {
+    // ✅ Use TailwindCSS classes directly in HTML: transition-all hover:shadow-md hover:-translate-y-0.5
+    transition: all $transition-base;
+    
+    &:hover {
+      box-shadow: $shadow-md;
+      transform: translateY(-2px);
+    }
+  }
+}
+
+.card-header {
+  padding: $spacing-4 $spacing-6;
+  border-bottom: 1px solid $color-border;
+  background-color: $color-background-secondary;
+  
+  h1, h2, h3, h4, h5, h6 {
+    margin: 0;
+  }
+}
+
+.card-body {
+  padding: $spacing-6;
+}
+
+.card-footer {
+  padding: $spacing-4 $spacing-6;
+  border-top: 1px solid $color-border;
+  background-color: $color-background-secondary;
+}
+
+// Card variants
+.card-elevated {
+  box-shadow: $shadow-md;
+  
+  &:hover {
+    box-shadow: $shadow-lg;
+  }
+}
+
+.card-flat {
+  box-shadow: none;
+  border: 2px solid $color-border;
+}
+
+.card-primary {
+  border-color: $color-primary;
+  
+  .card-header {
+    background-color: $color-primary;
+    color: $color-white;
+    border-bottom-color: $color-primary;
+  }
+}
+
+.card-success {
+  border-color: $color-success;
+  
+  .card-header {
+    background-color: $color-success;
+    color: $color-white;
+    border-bottom-color: $color-success;
+  }
+}
+
+.card-warning {
+  border-color: $color-warning;
+  
+  .card-header {
+    background-color: $color-warning;
+    color: $color-text-primary;
+    border-bottom-color: $color-warning;
+  }
+}
+
+.card-danger {
+  border-color: $color-danger;
+  
+  .card-header {
+    background-color: $color-danger;
+    color: $color-white;
+    border-bottom-color: $color-danger;
+  }
+}
+
+// Special card layouts
+.card-profile {
+  text-align: center;
+  
+  .card-avatar {
+    margin-top: -#{$spacing-12};
+    margin-bottom: $spacing-4;
+    
+    img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: 4px solid $color-white;
+      box-shadow: $shadow-md;
+    }
+  }
+}
+
+.card-stats {
+  .card-body {
+    // ✅ Use TailwindCSS classes directly in HTML: flex items-center justify-between
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .stats-icon {
+    font-size: $font-size-3xl;
+    color: $color-primary;
+  }
+  
+  .stats-content {
+    text-align: right;
+    
+    .stats-number {
+      font-size: $font-size-2xl;
+      font-weight: $font-weight-bold;
+      color: $color-text-primary;
+      margin: 0;
+    }
+    
+    .stats-label {
+      font-size: $font-size-sm;
+      color: $color-text-muted;
+      margin: 0;
+    }
+  }
+}
+
+// Card grids
+.card-grid {
+  gap: $spacing-6;
+  // ✅ Use TailwindCSS classes directly in HTML: grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  @include respond-to(md) {
+    gap: $spacing-8;
+  }
+}

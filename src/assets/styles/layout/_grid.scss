@@ -1,0 +1,75 @@
+// ==========================================================================
+// GRID SYSTEM (Now handled by TailwindCSS)
+// ==========================================================================
+
+// ✅ TailwindCSS provides all grid utilities out of the box:
+//
+// GRID DISPLAY:
+// - grid, inline-grid
+//
+// GRID COLUMNS:
+// - grid-cols-1, grid-cols-2, grid-cols-3, grid-cols-4, grid-cols-5, grid-cols-6
+// - grid-cols-7, grid-cols-8, grid-cols-9, grid-cols-10, grid-cols-11, grid-cols-12
+// - grid-cols-none, grid-cols-subgrid
+//
+// RESPONSIVE GRID:
+// - sm:grid-cols-2, md:grid-cols-3, lg:grid-cols-4, xl:grid-cols-6
+//
+// GAP UTILITIES:
+// - gap-0, gap-1, gap-2, gap-3, gap-4, gap-5, gap-6, gap-8, gap-10, gap-12
+// - gap-x-4, gap-y-2 (for different horizontal/vertical gaps)
+//
+// GRID PLACEMENT:
+// - col-span-1, col-span-2, col-span-full
+// - col-start-1, col-start-2, col-end-3, col-end-4
+//
+// EXAMPLES:
+// - <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+// - <div class="grid grid-cols-12 gap-4">
+// - <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 md:gap-6">
+
+// Legacy support classes (if absolutely needed - prefer TailwindCSS classes)
+.grid-responsive {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 1rem;
+  
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+  
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.grid-responsive-2-3-4 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+  
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.grid-responsive-1-2-3 {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 1rem;
+  
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+  
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
