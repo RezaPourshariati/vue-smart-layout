@@ -186,9 +186,8 @@ export const layoutPresets: Record<string, LayoutPreset> = {
 // Helper function to get layout config by name
 export const getLayoutConfig = (layoutName: string): LayoutConfig => {
   const preset = layoutPresets[layoutName]
-  if (preset) {
+  if (preset)
     return preset.config
-  }
 
   // Fallback to simple layout
   console.warn(`Layout preset "${layoutName}" not found. Using simple layout.`)
@@ -201,9 +200,9 @@ export const createLayoutConfig = (overrides: Partial<LayoutConfig>): LayoutConf
   return {
     ...baseConfig,
     ...overrides,
-    header: {...baseConfig.header, ...overrides.header},
+    header: overrides.header ? {...baseConfig.header, ...overrides.header} : baseConfig.header,
     sidebar: overrides.sidebar ? {...overrides.sidebar} : undefined,
-    container: {...baseConfig.container, ...overrides.container},
-    footer: {...baseConfig.footer, ...overrides.footer}
+    container: overrides.container ? {...baseConfig.container, ...overrides.container} : baseConfig.container,
+    footer: overrides.footer ? {...baseConfig.footer, ...overrides.footer} : baseConfig.footer
   }
 }

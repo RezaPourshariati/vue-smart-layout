@@ -10,7 +10,6 @@ const route = useRoute()
 // Computed property to determine the active layout and configuration
 const layoutInfo = computed(() => {
   const layoutIdentifier = route.meta.layout as string | LayoutConfig | undefined
-  console.log('+++>', layoutIdentifier)
   return resolveLayout(layoutIdentifier)
 })
 
@@ -18,7 +17,8 @@ const layout = computed(() => layoutInfo.value.component)
 const layoutConfig = computed(() => layoutInfo.value.config)
 
 watch(() => layoutInfo.value, (newVal) => {
-  console.log('----->', newVal)
+  console.log('component ----->', newVal.component)
+  console.log('config ----->', newVal.config)
 })
 </script>
 

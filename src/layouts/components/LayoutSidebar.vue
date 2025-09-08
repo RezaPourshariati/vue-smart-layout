@@ -1,22 +1,22 @@
 <template>
-  <aside 
+  <aside
     :class="sidebarClasses"
     :style="sidebarStyles"
   >
     <div class="sidebar-content">
-      <div 
-        v-for="section in config.content" 
+      <div
+        v-for="section in config.content"
         :key="section"
         class="sidebar-section"
       >
-        <component 
+        <component
           :is="getSectionComponent(section)"
           :variant="config.variant"
         />
       </div>
     </div>
-    
-    <button 
+
+    <button
       v-if="config.collapsible"
       @click="toggleCollapse"
       class="collapse-button"
@@ -55,7 +55,7 @@ const sidebarStyles = computed(() => ({
 }))
 
 const getSectionComponent = (section: string) => {
-  const components: Record<string, any> = {
+  const components: Record<string, typeof SidebarNavigation | typeof SidebarFilters | typeof SidebarInfo> = {
     'navigation': SidebarNavigation,
     'filters': SidebarFilters,
     'info': SidebarInfo

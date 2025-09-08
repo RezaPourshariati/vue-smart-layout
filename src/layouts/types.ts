@@ -1,4 +1,6 @@
 // Layout configuration types
+import type {Component} from "vue";
+
 export interface HeaderConfig {
   type: 'minimal' | 'standard' | 'hero'
   color?: string
@@ -44,6 +46,11 @@ export interface LayoutPreset {
   name: string
   config: LayoutConfig
   description?: string
+}
+
+export interface ResolvedLayouts {
+  component?: Component,
+  config?: LayoutConfig
 }
 
 // Route meta extension

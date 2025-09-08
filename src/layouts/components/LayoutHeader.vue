@@ -39,12 +39,12 @@ const headerStyles = computed(() => ({
     :style="headerStyles"
   >
     <div class="w-full max-w-6xl mx-auto px-8 flex justify-between items-center">
-      <h1 
-        v-if="config.title" 
+      <h1
+        v-if="config.title"
         :class="[
           'font-semibold m-0',
-          config.type === 'hero' 
-            ? 'text-2xl md:text-3xl text-white' 
+          config.type === 'hero'
+            ? 'text-2xl md:text-3xl text-white'
             : 'text-xl md:text-2xl text-gray-900'
         ]"
       >

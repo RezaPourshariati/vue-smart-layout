@@ -2,6 +2,7 @@ import { defineAsyncComponent } from 'vue'
 import type { Component } from 'vue'
 import type { LayoutConfig } from './types'
 import { getLayoutConfig, layoutPresets } from './presets'
+import type { ResolvedLayouts } from './types'
 
 export const defaultLayout: string = 'simple'
 
@@ -9,7 +10,7 @@ export const defaultLayout: string = 'simple'
 export const BaseLayout = defineAsyncComponent(() => import('./BaseLayout.vue'))
 
 // Helper function to resolve layout configuration
-export const resolveLayout = (layoutIdentifier: string | LayoutConfig | undefined): { component: Component; config: LayoutConfig } => {
+export const resolveLayout = (layoutIdentifier: string | LayoutConfig | undefined): ResolvedLayouts => {
   // If no layout specified, use default
   if (!layoutIdentifier) {
     return {
