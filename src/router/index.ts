@@ -87,6 +87,15 @@ const routes: RouteRecordRaw[] = [
     name: 'Test',
     component: () => import('@/views/Home.vue')
     // No layout specified - will use default 'simple' layout
+  },
+  {
+    path: '/wow',
+    name: 'Wow',
+    component: () => import('@/views/Wow.vue'),
+    meta: {
+      layout: 'wow'
+    }
+    // No layout specified - will use default 'simple' layout
   }
 ]
 

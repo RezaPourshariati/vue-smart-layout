@@ -32,7 +32,8 @@ const navigationLinks = [
   { name: 'Contacts', path: '/contacts' },
   { name: 'Dashboard', path: '/dashboard' },
   { name: 'Profile', path: '/profile' },
-  { name: 'Landing', path: '/landing' }
+  { name: 'Landing', path: '/landing' },
+  { name: 'Wow', path: '/wow' }
 ]
 
 const getLinkClasses = (variant: string) => {
