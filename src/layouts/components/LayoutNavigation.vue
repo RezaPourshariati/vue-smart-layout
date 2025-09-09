@@ -1,8 +1,8 @@
 <template>
   <!-- ✅ 95% TailwindCSS + 5% custom active states -->
   <nav class="flex items-center space-x-1 md:space-x-2">
-    <router-link 
-      v-for="link in navigationLinks" 
+    <router-link
+      v-for="link in navigationLinks"
       :key="link.path"
       :to="link.path"
       :class="[
@@ -37,7 +37,7 @@ const navigationLinks = [
 
 const getLinkClasses = (variant: string) => {
   const baseClasses = 'hover:bg-gray-100 active:bg-gray-200'
-  
+
   switch (variant) {
     case 'minimal':
       return `${baseClasses} text-gray-600 hover:text-gray-900`
@@ -55,12 +55,12 @@ const getLinkClasses = (variant: string) => {
 
 .nav-link-animated {
   position: relative;
-  
+
   // Complex active state animation that TailwindCSS can't handle easily
   &.router-link-active {
     color: theme('colors.emerald.600');
     background-color: theme('colors.emerald.50');
-    
+
     &::after {
       content: '';
       position: absolute;
@@ -73,12 +73,12 @@ const getLinkClasses = (variant: string) => {
       animation: expandUnderline 0.3s ease-out forwards;
     }
   }
-  
+
   // Hero variant active state
   &.router-link-active:where(.text-white\/90) {
     color: white;
     background-color: rgba(255, 255, 255, 0.2);
-    
+
     &::after {
       background-color: white;
     }

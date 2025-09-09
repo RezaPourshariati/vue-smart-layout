@@ -6,7 +6,7 @@
 
 .landing {
   padding: 0;
-  
+
   .hero {
     min-height: 80vh;
     // ✅ Use TailwindCSS classes directly: flex items-center justify-center
@@ -18,13 +18,13 @@
     padding: $spacing-16 $spacing-8;
     position: relative;
     overflow: hidden;
-    
+
     @include respond-down(md) {
       flex-direction: column;
       text-align: center;
       padding: $spacing-8 $spacing-4;
     }
-    
+
     &::before {
       content: '';
       position: absolute;
@@ -36,58 +36,58 @@
       opacity: 0.3;
     }
   }
-  
+
   .hero-content {
     flex: 1;
     max-width: 600px;
     z-index: 1;
     position: relative;
-    
+
     .hero-title {
       font-size: $font-size-4xl;
       font-weight: $font-weight-extrabold;
       margin: 0 0 $spacing-4 0;
       line-height: $line-height-tight;
-      
+
       @include respond-to(md) {
         font-size: $font-size-5xl;
       }
-      
+
       @include respond-to(lg) {
         font-size: $font-size-6xl;
       }
-      
+
       @include respond-down(md) {
         font-size: $font-size-3xl;
       }
     }
-    
+
     .hero-subtitle {
       font-size: $font-size-lg;
       margin: 0 0 $spacing-8 0;
       opacity: 0.9;
       line-height: $line-height-relaxed;
-      
+
       @include respond-to(md) {
         font-size: $font-size-xl;
       }
-      
+
       @include respond-down(md) {
         font-size: $font-size-base;
       }
     }
   }
-  
+
   .hero-actions {
     display: flex;
     gap: $spacing-4;
     flex-wrap: wrap;
-    
+
     @include respond-down(md) {
       justify-content: center;
     }
   }
-  
+
   .hero-visual {
     flex: 1;
     // ✅ Use TailwindCSS classes directly: flex items-center justify-center
@@ -96,12 +96,12 @@
     align-items: center;
     z-index: 1;
     position: relative;
-    
+
     @include respond-down(md) {
       margin-top: $spacing-8;
     }
   }
-  
+
   .layout-preview {
     width: 300px;
     height: 200px;
@@ -110,29 +110,29 @@
     box-shadow: $shadow-2xl;
     overflow: hidden;
     transform: perspective(1000px) rotateY(-15deg) rotateX(10deg);
-    
+
     @include respond-down(md) {
       width: 250px;
       height: 160px;
       transform: none;
     }
-    
+
     .preview-header {
       height: 40px;
       background: $color-background-secondary;
       border-bottom: 1px solid $color-border;
     }
-    
+
     .preview-body {
       display: flex;
       height: calc(100% - 40px);
-      
+
       .preview-sidebar {
         width: 80px;
         background: $color-primary;
         opacity: 0.8;
       }
-      
+
       .preview-content {
         flex: 1;
         background: linear-gradient(45deg, $color-background-secondary 25%, transparent 25%),
@@ -143,37 +143,37 @@
       }
     }
   }
-  
+
   .features {
     padding: $spacing-24 $spacing-8;
     background: $color-background-secondary;
-    
+
     @include respond-down(md) {
       padding: $spacing-16 $spacing-4;
     }
   }
-  
+
   .section-title {
     text-align: center;
     font-size: $font-size-3xl;
     font-weight: $font-weight-extrabold;
     margin: 0 0 $spacing-16 0;
     color: $color-text-primary;
-    
+
     @include respond-to(md) {
       font-size: $font-size-4xl;
     }
-    
+
     @include respond-to(lg) {
       font-size: $font-size-5xl;
     }
-    
+
     @include respond-down(md) {
       font-size: $font-size-2xl;
       margin-bottom: $spacing-12;
     }
   }
-  
+
   .features-grid {
     // ✅ Use TailwindCSS classes directly: grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto
     display: grid;
@@ -181,16 +181,16 @@
     gap: $spacing-8;
     max-width: 1200px;
     margin: 0 auto;
-    
+
     @media (min-width: 768px) {
       grid-template-columns: repeat(2, 1fr);
     }
-    
+
     @media (min-width: 1024px) {
       grid-template-columns: repeat(3, 1fr);
     }
   }
-  
+
   .feature-card {
     // ✅ Use TailwindCSS classes directly: bg-white border border-gray-200 rounded-md p-8 shadow-sm
     background: $color-white;
@@ -200,54 +200,54 @@
     box-shadow: $shadow-sm;
     text-align: center;
     transition: transform $transition-base;
-    
+
     &:hover {
       transform: translateY(-8px);
     }
-    
+
     @include respond-down(md) {
       padding: $spacing-6;
     }
-    
+
     .feature-icon {
       font-size: $font-size-4xl;
       margin-bottom: $spacing-4;
     }
-    
+
     h3 {
       font-size: $font-size-xl;
       font-weight: $font-weight-semibold;
       margin: 0 0 $spacing-4 0;
       color: $color-text-primary;
     }
-    
+
     p {
       color: $color-text-secondary;
       line-height: $line-height-relaxed;
       margin: 0;
     }
   }
-  
+
   .code-example {
     padding: $spacing-24 $spacing-8;
     background: $color-secondary;
     color: $color-white;
-    
+
     @include respond-down(md) {
       padding: $spacing-16 $spacing-4;
     }
-    
+
     .section-title {
       color: $color-white;
     }
   }
-  
+
   .code-showcase {
     // ✅ Use TailwindCSS classes directly: flex items-center justify-center
     display: flex;
     justify-content: center;
     align-items: center;
-    
+
     .code-block {
       background: $color-secondary-dark;
       border-radius: $border-radius-xl;
@@ -255,11 +255,11 @@
       max-width: 600px;
       width: 100%;
       overflow-x: auto;
-      
+
       @include respond-down(md) {
         padding: $spacing-6;
       }
-      
+
       pre {
         margin: 0;
         font-family: $font-family-mono;
@@ -268,43 +268,43 @@
         color: rgba($color-white, 0.9);
         background: none;
         padding: 0;
-        
+
         @include respond-down(md) {
           font-size: $font-size-xs;
         }
       }
     }
   }
-  
+
   .cta {
     padding: $spacing-24 $spacing-8;
     background: linear-gradient(135deg, $color-primary 0%, $color-secondary 100%);
     color: $color-white;
     text-align: center;
-    
+
     @include respond-down(md) {
       padding: $spacing-16 $spacing-4;
     }
-    
+
     h2 {
       font-size: $font-size-3xl;
       font-weight: $font-weight-extrabold;
       margin: 0 0 $spacing-4 0;
-      
+
       @include respond-to(md) {
         font-size: $font-size-4xl;
       }
-      
+
       @include respond-down(md) {
         font-size: $font-size-2xl;
       }
     }
-    
+
     p {
       font-size: $font-size-lg;
       margin: 0 0 $spacing-8 0;
       opacity: 0.9;
-      
+
       @include respond-to(md) {
         font-size: $font-size-xl;
       }
