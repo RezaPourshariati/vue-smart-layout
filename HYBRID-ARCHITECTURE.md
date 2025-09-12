@@ -209,3 +209,96 @@ export default defineConfig({
 ---
 
 **Result**: A maintainable, performant, and developer-friendly styling architecture that scales with your project! 🎉
+
+## ⚠️ **TailwindCSS v4 + Sass: What Works and What Doesn't**
+
+TailwindCSS v4 **no longer supports preprocessors directly**. You can still use Sass — just don't put Tailwind directives inside SCSS files. Follow these rules:
+
+### **✅ What Works (Allowed)**
+- **TailwindCSS utilities in templates**: `class="p-4 md:flex lg:grid-cols-3"`
+- **Tailwind directives in plain CSS files only**, e.g., `src/assets/main.css`:
+  ```css
+  @import 'tailwindcss';
+  /* Optional: @layer blocks in CSS only */
+  ```
+- **Sass for non-Tailwind concerns**: Complex animations, mixins, math, theming, component-scoped effects
+- **Native CSS features inside SCSS**: Media queries, container queries — but **NOT** Tailwind's `@screen`, `@apply`, or `@tailwind`
+- **CSS custom properties for tokens**: Reference them from Tailwind via `colors: { brand: 'var(--brand-color)' }`
+
+### **❌ What Doesn't Work (Not Allowed)**
+- **Tailwind directives inside SCSS**: `@tailwind`, `@apply`, `@screen`, `@layer`
+- **Re-importing Tailwind from SCSS files**
+- **Using `@screen` in component styles** (use native media queries instead)
+
+### **🔧 Practical Migration Patterns**
+
+#### **Responsive Design**
+```scss
+// ❌ OLD (TailwindCSS v3 + Sass)
+@screen xl {
+  .custom-grid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  }
+}
+
+// ✅ NEW (TailwindCSS v4 + Sass)
+@media (min-width: 1280px) {
+  .custom-grid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  }
+}
+```
+
+#### **Custom Grids**
+```html
+<!-- ✅ Use Tailwind arbitrary values instead of Sass + @screen -->
+<div class="xl:grid-cols-[repeat(auto-fit,_minmax(300px,_1fr))] grid gap-6"></div>
+```
+
+#### **Theming**
+```css
+/* ✅ Define tokens in CSS (or SCSS that compiles to CSS) */
+:root { 
+  --color-surface: #fff; 
+  --color-text: #111;
+}
+
+[data-theme="dark"] { 
+  --color-surface: #111; 
+  --color-text: #fff;
+}
+```
+
+#### **Custom Utilities**
+```css
+/* ✅ Author custom utilities in CSS (not SCSS) using @layer */
+@layer utilities {
+  .fade-in {
+    opacity: 0;
+    animation: fadeIn 0.6s ease-in-out forwards;
+  }
+}
+```
+
+### **🎯 Repository-Specific Implementation**
+
+- **TailwindCSS loaded from**: `src/assets/main.css` via `@import 'tailwindcss'`
+- **Sass in Vue SFCs**: Use **only** for mixins, animations, theming — **avoid** Tailwind directives
+- **Fixed components**: `Dashboard.vue` updated to use `@media` instead of `@screen`
+
+### **📋 Migration Checklist**
+
+- [x] TailwindCSS v4.1.13 installed
+- [x] TailwindCSS imported in `main.css` (not SCSS)
+- [x] Fixed `@screen` usage in `Dashboard.vue`
+- [ ] Audit remaining components for `@apply`, `@screen`, `@tailwind` usage
+- [ ] Convert Sass-based responsive patterns to native CSS media queries
+- [ ] Test build process for any remaining compatibility issues
+
+### **🚀 Alternative Approaches for 2025**
+
+1. **Modified Hybrid** (Current): Keep v4 + Sass with strict separation
+2. **Downgrade to v3**: Maintain full preprocessor support
+3. **Pure v4**: Migrate entirely to CSS-first architecture
+
+Choose based on your project's complexity and migration timeline!
