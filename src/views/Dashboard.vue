@@ -10,7 +10,7 @@
         Welcome to your dashboard overview
       </p>
     </div>
-    
+
     <!-- Dashboard Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-auto-fit gap-6">
       <!-- Analytics Card -->
@@ -24,7 +24,7 @@
           <span class="text-sm text-gray-500 mt-1">Total Views</span>
         </div>
       </div>
-      
+
       <!-- Users Card -->
       <div class="dashboard-card-animated bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
         <h3 class="text-lg md:text-xl font-semibold text-gray-900 mb-2">👥 Users</h3>
@@ -36,7 +36,7 @@
           <span class="text-sm text-gray-500 mt-1">Active Users</span>
         </div>
       </div>
-      
+
       <!-- Settings Card -->
       <div class="dashboard-card-animated bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
         <h3 class="text-lg md:text-xl font-semibold text-gray-900 mb-2">⚙️ Settings</h3>
@@ -47,7 +47,7 @@
           Configure
         </button>
       </div>
-      
+
       <!-- Recent Activity Card -->
       <div class="dashboard-card-animated bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
         <h3 class="text-lg md:text-xl font-semibold text-gray-900 mb-4">📝 Recent Activity</h3>
@@ -80,14 +80,15 @@
 
 .dashboard-card-animated {
   @include fade-in(0.6s, 0.1s);
-  
+
   &:hover {
     transform: translateY(-2px);
   }
 }
 
 // Custom grid for auto-fit columns (not available in TailwindCSS)
-@screen xl {
+// ✅ TailwindCSS v4 compatible: Use native CSS media queries instead of @screen
+@media (min-width: 1280px) {
   .xl\:grid-cols-auto-fit {
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   }

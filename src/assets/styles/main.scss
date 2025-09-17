@@ -10,5 +10,6 @@
 @use 'layout';
 @use 'components';
 @use 'pages';
-@import "tailwindcss";
 
+// THEN @import STATEMENTS (Using @use for TailwindCSS v4+)
+// @use "tailwindcss";

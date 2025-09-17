@@ -9,6 +9,7 @@
     "importHelpers": false,
     "isolatedModules": true,
     "jsx": "preserve",
+    "noEmit": true,
     "lib": [
       "esnext",
       "dom",
