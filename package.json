@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
+  "packageManager": "pnpm@10.16.1",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "dev": "vite",
@@ -13,7 +14,6 @@
     "lint": "eslint .",
     "lint:fix": "eslint ./src --fix"
   },
-  "packageManager": "pnpm@10.16.1",
   "dependencies": {
     "@tailwindcss/vite": "^4.1.13",
     "sass": "^1.86.1",
