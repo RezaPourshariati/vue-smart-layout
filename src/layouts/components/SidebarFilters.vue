@@ -1,3 +1,11 @@
+<script setup lang="ts">
+interface Props {
+  variant?: string
+}
+
+defineProps<Props>()
+</script>
+
 <template>
   <div class="sidebar-filters">
     <h3 class="sidebar-title">Filters</h3>
@@ -10,7 +18,7 @@
         <option>Business</option>
       </select>
     </div>
-    
+
     <div class="filter-group">
       <label class="filter-label">Status</label>
       <div class="checkbox-group">
@@ -27,14 +35,6 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-interface Props {
-  variant?: string
-}
-
-defineProps<Props>()
-</script>
 
 <style scoped>
 .sidebar-filters {

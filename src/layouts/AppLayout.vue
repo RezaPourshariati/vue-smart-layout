@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import {computed} from 'vue'
-import {useRoute} from 'vue-router'
-import {resolveLayout} from '@/layouts'
-import type {LayoutConfig} from '@/layouts'
-import {watch} from 'vue'
+import type { LayoutConfig } from '@/layouts'
+import { computed, watch } from 'vue'
+import { useRoute } from 'vue-router'
+import { resolveLayout } from '@/layouts'
 
 const route = useRoute()
 
@@ -30,7 +29,7 @@ watch(() => layoutInfo.value, (newVal) => {
           :is="layout"
           :config="layoutConfig"
         >
-          <slot/>
+          <slot />
         </component>
       </template>
       <template #fallback>

@@ -1,8 +1,6 @@
+import type { LayoutConfig, ResolvedLayouts } from './types'
 import { defineAsyncComponent } from 'vue'
-import type { Component } from 'vue'
-import type { LayoutConfig } from './types'
 import { getLayoutConfig, layoutPresets } from './presets'
-import type { ResolvedLayouts } from './types'
 
 export const defaultLayout: string = 'simple'
 
@@ -10,12 +8,12 @@ export const defaultLayout: string = 'simple'
 export const BaseLayout = defineAsyncComponent(() => import('./BaseLayout.vue'))
 
 // Helper function to resolve layout configuration
-export const resolveLayout = (layoutIdentifier: string | LayoutConfig | undefined): ResolvedLayouts => {
+export function resolveLayout(layoutIdentifier: string | LayoutConfig | undefined): ResolvedLayouts {
   // If no layout specified, use default
   if (!layoutIdentifier) {
     return {
       component: BaseLayout,
-      config: getLayoutConfig(defaultLayout)
+      config: getLayoutConfig(defaultLayout),
     }
   }
 
@@ -23,7 +21,7 @@ export const resolveLayout = (layoutIdentifier: string | LayoutConfig | undefine
   if (typeof layoutIdentifier === 'object') {
     return {
       component: BaseLayout,
-      config: layoutIdentifier
+      config: layoutIdentifier,
     }
   }
 
@@ -31,7 +29,7 @@ export const resolveLayout = (layoutIdentifier: string | LayoutConfig | undefine
   if (layoutPresets[layoutIdentifier]) {
     return {
       component: BaseLayout,
-      config: getLayoutConfig(layoutIdentifier)
+      config: getLayoutConfig(layoutIdentifier),
     }
   }
 
@@ -39,11 +37,10 @@ export const resolveLayout = (layoutIdentifier: string | LayoutConfig | undefine
   console.warn(`Layout "${layoutIdentifier}" not found. Using default layout.`)
   return {
     component: BaseLayout,
-    config: getLayoutConfig(defaultLayout)
+    config: getLayoutConfig(defaultLayout),
   }
 }
 
+export { getLayoutConfig, layoutPresets } from './presets'
 // Export types and presets
 export type { LayoutConfig } from './types'
-export { getLayoutConfig, layoutPresets } from './presets'
-

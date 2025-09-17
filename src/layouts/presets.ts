@@ -1,4 +1,4 @@
-import type {LayoutConfig, LayoutPreset} from './types'
+import type { LayoutConfig, LayoutPreset } from './types'
 
 // Predefined layout configurations for common use cases
 export const layoutPresets: Record<string, LayoutPreset> = {
@@ -11,18 +11,18 @@ export const layoutPresets: Record<string, LayoutPreset> = {
       header: {
         type: 'minimal',
         showNavigation: true,
-        height: '3rem'
+        height: '3rem',
       },
       container: {
         maxWidth: '1200px',
         centered: true,
-        padding: '2rem'
+        padding: '2rem',
       },
       footer: {
         show: true,
-        variant: 'minimal'
-      }
-    }
+        variant: 'minimal',
+      },
+    },
   },
 
   // Home page layout (like your current AppLayoutHome)
@@ -36,19 +36,19 @@ export const layoutPresets: Record<string, LayoutPreset> = {
         color: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
         showNavigation: true,
         title: 'Welcome Home',
-        height: '8rem'
+        height: '8rem',
       },
       container: {
         maxWidth: '1100px',
         centered: true,
         padding: '2rem',
-        className: 'home-container'
+        className: 'home-container',
       },
       footer: {
         show: true,
-        variant: 'standard'
-      }
-    }
+        variant: 'standard',
+      },
+    },
   },
 
   // About page layout (like your current AppLayoutAbout)
@@ -61,18 +61,18 @@ export const layoutPresets: Record<string, LayoutPreset> = {
         type: 'standard',
         color: '#2196F3',
         showNavigation: true,
-        height: '5rem'
+        height: '5rem',
       },
       container: {
         maxWidth: '1200px',
         centered: true,
-        padding: '2rem'
+        padding: '2rem',
       },
       footer: {
         show: true,
-        variant: 'standard'
-      }
-    }
+        variant: 'standard',
+      },
+    },
   },
 
   // Contact page layout (like your current AppLayoutContacts)
@@ -85,18 +85,18 @@ export const layoutPresets: Record<string, LayoutPreset> = {
         type: 'standard',
         color: '#f44336',
         showNavigation: true,
-        height: '5rem'
+        height: '5rem',
       },
       container: {
         maxWidth: '1200px',
         centered: true,
-        padding: '2rem'
+        padding: '2rem',
       },
       footer: {
         show: true,
-        variant: 'extended'
-      }
-    }
+        variant: 'extended',
+      },
+    },
   },
 
   // Dashboard layout with sidebar
@@ -109,23 +109,23 @@ export const layoutPresets: Record<string, LayoutPreset> = {
         type: 'minimal',
         showNavigation: false,
         title: 'Dashboard',
-        height: '4rem'
+        height: '4rem',
       },
       sidebar: {
         position: 'left',
         width: '250px',
         collapsible: true,
         content: ['navigation'],
-        variant: 'navigation'
+        variant: 'navigation',
       },
       container: {
         fullHeight: true,
-        padding: '1.5rem'
+        padding: '1.5rem',
       },
       footer: {
-        show: false
-      }
-    }
+        show: false,
+      },
+    },
   },
 
   // Admin layout with filters
@@ -139,24 +139,24 @@ export const layoutPresets: Record<string, LayoutPreset> = {
         color: '#6c757d',
         showNavigation: true,
         title: 'Admin Panel',
-        height: '4rem'
+        height: '4rem',
       },
       sidebar: {
         position: 'left',
         width: '280px',
         collapsible: true,
         content: ['navigation', 'filters'],
-        variant: 'filters'
+        variant: 'filters',
       },
       container: {
         fullHeight: true,
-        padding: '1rem'
+        padding: '1rem',
       },
       footer: {
         show: true,
-        variant: 'minimal'
-      }
-    }
+        variant: 'minimal',
+      },
+    },
   },
 
   // Full-width layout for landing pages
@@ -169,17 +169,17 @@ export const layoutPresets: Record<string, LayoutPreset> = {
         type: 'hero',
         transparent: true,
         showNavigation: true,
-        height: '6rem'
+        height: '6rem',
       },
       container: {
         padding: '0',
-        className: 'landing-container'
+        className: 'landing-container',
       },
       footer: {
         show: true,
-        variant: 'extended'
-      }
-    }
+        variant: 'extended',
+      },
+    },
   },
   wow: {
     name: 'Wow',
@@ -190,22 +190,22 @@ export const layoutPresets: Record<string, LayoutPreset> = {
         type: 'standard',
         transparent: true,
         showNavigation: true,
-        height: '4rem'
+        height: '4rem',
       },
       container: {
         padding: '0',
-        className: 'landing-container'
+        className: 'landing-container',
       },
       footer: {
         show: true,
-        variant: 'extended'
-      }
-    }
-  }
+        variant: 'extended',
+      },
+    },
+  },
 }
 
 // Helper function to get layout config by name
-export const getLayoutConfig = (layoutName: string): LayoutConfig => {
+export function getLayoutConfig(layoutName: string): LayoutConfig {
   const preset = layoutPresets[layoutName]
   if (preset)
     return preset.config
@@ -216,14 +216,14 @@ export const getLayoutConfig = (layoutName: string): LayoutConfig => {
 }
 
 // Helper function to create custom layout config
-export const createLayoutConfig = (overrides: Partial<LayoutConfig>): LayoutConfig => {
+export function createLayoutConfig(overrides: Partial<LayoutConfig>): LayoutConfig {
   const baseConfig = layoutPresets.simple.config
   return {
     ...baseConfig,
     ...overrides,
-    header: overrides.header ? {...baseConfig.header, ...overrides.header} : baseConfig.header,
-    sidebar: overrides.sidebar ? {...overrides.sidebar} : undefined,
-    container: overrides.container ? {...baseConfig.container, ...overrides.container} : baseConfig.container,
-    footer: overrides.footer ? {...baseConfig.footer, ...overrides.footer} : baseConfig.footer
+    header: overrides.header ? { ...baseConfig.header, ...overrides.header } : baseConfig.header,
+    sidebar: overrides.sidebar ? { ...overrides.sidebar } : undefined,
+    container: overrides.container ? { ...baseConfig.container, ...overrides.container } : baseConfig.container,
+    footer: overrides.footer ? { ...baseConfig.footer, ...overrides.footer } : baseConfig.footer,
   }
 }

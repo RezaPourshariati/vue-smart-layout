@@ -1,5 +1,5 @@
 // Layout configuration types
-import type {Component} from "vue";
+import type { Component } from 'vue'
 
 export interface HeaderConfig {
   type: 'minimal' | 'standard' | 'hero'
@@ -49,7 +49,7 @@ export interface LayoutPreset {
 }
 
 export interface ResolvedLayouts {
-  component?: Component,
+  component?: Component
   config?: LayoutConfig
 }
 

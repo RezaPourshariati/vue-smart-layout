@@ -1,5 +1,5 @@
-import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
 
 const routes: RouteRecordRaw[] = [
   {
@@ -7,48 +7,48 @@ const routes: RouteRecordRaw[] = [
     name: 'Home',
     component: () => import('@/views/Home.vue'),
     meta: {
-      layout: 'home'  // Using new preset system
-    }
+      layout: 'home', // Using new preset system
+    },
   },
   {
     path: '/about',
     name: 'About',
     component: () => import('@/views/About.vue'),
     meta: {
-      layout: 'about'  // Using new preset system
-    }
+      layout: 'about', // Using new preset system
+    },
   },
   {
     path: '/contacts',
     name: 'Contacts',
     component: () => import('@/views/Contacts.vue'),
     meta: {
-      layout: 'contacts'  // Using new preset system
-    }
+      layout: 'contacts', // Using new preset system
+    },
   },
   {
     path: '/dashboard',
     name: 'Dashboard',
     component: () => import('@/views/Dashboard.vue'),
     meta: {
-      layout: 'dashboard'  // New dashboard layout
-    }
+      layout: 'dashboard', // New dashboard layout
+    },
   },
   {
     path: '/admin',
     name: 'Admin',
     component: () => import('@/views/Dashboard.vue'),
     meta: {
-      layout: 'admin'  // New admin layout with filters
-    }
+      layout: 'admin', // New admin layout with filters
+    },
   },
   {
     path: '/landing',
     name: 'Landing',
     component: () => import('@/views/Landing.vue'),
     meta: {
-      layout: 'landing'  // New landing layout
-    }
+      layout: 'landing', // New landing layout
+    },
   },
   {
     path: '/profile',
@@ -63,29 +63,29 @@ const routes: RouteRecordRaw[] = [
           color: '#9c27b0',
           showNavigation: true,
           title: 'User Profile',
-          height: '4rem'
+          height: '4rem',
         },
         sidebar: {
           position: 'right',
           width: '300px',
           content: ['info'],
-          variant: 'info'
+          variant: 'info',
         },
         container: {
           maxWidth: '1000px',
-          padding: '1.5rem'
+          padding: '1.5rem',
         },
         footer: {
           show: true,
-          variant: 'minimal'
-        }
-      }
-    }
+          variant: 'minimal',
+        },
+      },
+    },
   },
   {
     path: '/test',
     name: 'Test',
-    component: () => import('@/views/Home.vue')
+    component: () => import('@/views/Home.vue'),
     // No layout specified - will use default 'simple' layout
   },
   {
@@ -93,15 +93,15 @@ const routes: RouteRecordRaw[] = [
     name: 'Wow',
     component: () => import('@/views/Wow.vue'),
     meta: {
-      layout: 'wow'
-    }
+      layout: 'wow',
+    },
     // No layout specified - will use default 'simple' layout
-  }
+  },
 ]
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes
+  routes,
 })
 
 export default router
