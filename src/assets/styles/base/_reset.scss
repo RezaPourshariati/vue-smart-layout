@@ -10,7 +10,7 @@
 *,
 *::before,
 *::after {
-  box-sizing: border-box;
+  box-sizing: inherit;
 }
 
 * {
@@ -18,16 +18,26 @@
 }
 
 html {
+  font-size: 62.5%;
   height: 100%;
   scroll-behavior: smooth;
 }
 
 body {
   min-height: 100%;
+  font-size: 1.6rem;
   line-height: $line-height-normal;
+  box-sizing: border-box;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  font-family: $font-family-primary;
+  font-weight: $font-weight-normal;
+  color: $color-text-primary;
+  background-color: $color-background;
+  transition:
+    color 0.5s,
+    background-color 0.5s;
 }
 
 img,

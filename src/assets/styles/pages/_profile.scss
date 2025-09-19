@@ -81,46 +81,6 @@
     gap: $spacing-8;
   }
 
-  .profile-section {
-    // ✅ Use TailwindCSS classes directly: bg-white border border-gray-200 rounded-md p-8 shadow-sm
-    background: $color-white;
-    border: 1px solid $color-gray-200;
-    border-radius: $border-radius-md;
-    padding: $spacing-8;
-    box-shadow: $shadow-sm;
-
-    @include respond-down(md) {
-      padding: $spacing-6;
-    }
-
-    h2 {
-      margin: 0 0 $spacing-6 0;
-      color: $color-text-primary;
-      font-size: $font-size-xl;
-      border-bottom: 2px solid $color-primary;
-      padding-bottom: $spacing-2;
-
-      @include respond-to(md) {
-        font-size: $font-size-2xl;
-      }
-    }
-  }
-
-  .skills-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: $spacing-3;
-
-    .skill-tag {
-      background: $color-primary;
-      color: $color-white;
-      padding: $spacing-2 $spacing-4;
-      border-radius: $border-radius-full;
-      font-size: $font-size-sm;
-      font-weight: $font-weight-medium;
-    }
-  }
-
   .projects-list {
     // ✅ Use TailwindCSS classes directly: flex flex-col gap-6
     display: flex;

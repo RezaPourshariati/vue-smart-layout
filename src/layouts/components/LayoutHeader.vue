@@ -59,15 +59,15 @@ const headerStyles = computed(() => ({
   </header>
 </template>
 
-<style lang="scss" scoped>
-// ✅ Only complex styles that TailwindCSS can't handle (10% of styling)
+<style scoped>
+/* ✅ Only complex styles that TailwindCSS can't handle (10% of styling) */
 
-// Complex gradient background
+/* Complex gradient background */
 .header-hero-gradient {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
-// Complex glassmorphism effect
+/* Complex glassmorphism effect */
 .header-glassmorphism {
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(10px);
@@ -75,7 +75,7 @@ const headerStyles = computed(() => ({
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-// Dark mode glassmorphism
+/* Dark mode glassmorphism */
 [data-theme="dark"] .header-glassmorphism {
   background: rgba(0, 0, 0, 0.7);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);

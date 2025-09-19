@@ -181,27 +181,27 @@ export const layoutPresets: Record<string, LayoutPreset> = {
       },
     },
   },
-  wow: {
-    name: 'Wow',
-    description: 'a wow page',
-    config: {
-      name: 'oww',
-      header: {
-        type: 'standard',
-        transparent: true,
-        showNavigation: true,
-        height: '4rem',
-      },
-      container: {
-        padding: '0',
-        className: 'landing-container',
-      },
-      footer: {
-        show: true,
-        variant: 'extended',
-      },
-    },
-  },
+  // wow: {
+  //   name: 'Wow',
+  //   description: 'a wow page',
+  //   config: {
+  //     name: 'oww',
+  //     header: {
+  //       type: 'standard',
+  //       transparent: true,
+  //       showNavigation: true,
+  //       height: '4rem',
+  //     },
+  //     container: {
+  //       padding: '0',
+  //       className: 'landing-container',
+  //     },
+  //     footer: {
+  //       show: true,
+  //       variant: 'extended',
+  //     },
+  //   },
+  // },
 }
 
 // Helper function to get layout config by name

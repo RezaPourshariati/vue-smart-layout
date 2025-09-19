@@ -1,20 +1,3 @@
-<template>
-  <!-- ✅ 95% TailwindCSS + 5% custom active states -->
-  <nav class="flex items-center space-x-1 md:space-x-2">
-    <router-link
-      v-for="link in navigationLinks"
-      :key="link.path"
-      :to="link.path"
-      :class="[
-        'nav-link-animated px-3 py-2 rounded-md text-sm font-medium transition-all duration-200',
-        getLinkClasses(props.variant)
-      ]"
-    >
-      {{ link.name }}
-    </router-link>
-  </nav>
-</template>
-
 <script setup lang="ts">
 
 interface Props {
@@ -33,7 +16,7 @@ const navigationLinks = [
   { name: 'Dashboard', path: '/dashboard' },
   { name: 'Profile', path: '/profile' },
   { name: 'Landing', path: '/landing' },
-  { name: 'Wow', path: '/wow' }
+  // { name: 'Wow', path: '/wow' }
 ]
 
 const getLinkClasses = (variant: string) => {
@@ -51,47 +34,57 @@ const getLinkClasses = (variant: string) => {
 }
 </script>
 
-<style lang="scss" scoped>
-// ✅ Only complex router-link active states (5% of styling)
+<template>
+  <!-- ✅ 95% TailwindCSS + 5% custom active states -->
+  <nav class="flex items-center space-x-1 md:space-x-2">
+    <router-link
+      v-for="link in navigationLinks"
+      :key="link.path"
+      :to="link.path"
+      :class="[
+        'nav-link-animated px-3 py-2 rounded-md text-sm font-medium transition-all duration-200',
+        getLinkClasses(props.variant)
+      ]"
+    >
+      {{ link.name }}
+    </router-link>
+  </nav>
+</template>
 
-.nav-link-animated {
-  position: relative;
+<style scoped>
+/* ✅ Only complex router-link active states (5% of styling) */
 
-  // Complex active state animation that TailwindCSS can't handle easily
-  &.router-link-active {
-    color: theme('colors.emerald.600');
-    background-color: theme('colors.emerald.50');
+.nav-link-animated { position: relative }
 
-    &::after {
-      content: '';
-      position: absolute;
-      bottom: -2px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 0;
-      height: 2px;
-      background-color: theme('colors.emerald.600');
-      animation: expandUnderline 0.3s ease-out forwards;
-    }
-  }
+.nav-link-animated.router-link-active {
+  color: var(--color-emerald-600);
+  background-color: var(--color-emerald-50);
+}
 
-  // Hero variant active state
-  &.router-link-active:where(.text-white\/90) {
-    color: white;
-    background-color: rgba(255, 255, 255, 0.2);
+.nav-link-animated.router-link-active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 2px;
+  background-color: var(--color-emerald-600);
+  animation: expandUnderline 0.3s ease-out forwards;
+}
 
-    &::after {
-      background-color: white;
-    }
-  }
+/* Hero variant active state */
+.nav-link-animated.router-link-active:where(.text-white\/90) {
+  color: white;
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.nav-link-animated.router-link-active:where(.text-white\/90)::after {
+  background-color: white;
 }
 
 @keyframes expandUnderline {
-  from {
-    width: 0;
-  }
-  to {
-    width: 80%;
-  }
+  from { width: 0 }
+  to { width: 80% }
 }
 </style>

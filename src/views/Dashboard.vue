@@ -1,3 +1,7 @@
+<script setup lang="ts">
+// Dashboard logic would go here
+</script>
+
 <template>
   <!-- ✅ 90% TailwindCSS + 10% custom animations -->
   <div class="p-0">
@@ -70,24 +74,16 @@
   </div>
 </template>
 
-<script setup lang="ts">
-// Dashboard logic would go here
-</script>
-
-<style lang="scss" scoped>
-// ✅ Only complex animations in Sass (10% of styling)
-@use '@/assets/styles/abstracts/mixins-essential' as *;
-
+<style scoped>
 .dashboard-card-animated {
-  @include fade-in(0.6s, 0.1s);
+  opacity: 0;
+    animation: fadeIn 0.6s ease-in-out 0.1s forwards;
 
   &:hover {
     transform: translateY(-2px);
   }
 }
 
-// Custom grid for auto-fit columns (not available in TailwindCSS)
-// ✅ TailwindCSS v4 compatible: Use native CSS media queries instead of @screen
 @media (min-width: 1280px) {
   .xl\:grid-cols-auto-fit {
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
