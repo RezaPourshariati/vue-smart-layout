@@ -1,8 +1,8 @@
 {
   "name": "vue-smart-layout",
+  "type": "module",
   "version": "0.0.0",
   "private": true,
-  "type": "module",
   "packageManager": "pnpm@10.17.0",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
@@ -26,11 +26,11 @@
     "@tsconfig/node22": "^22.0.0",
     "@types/node": "^24.5.1",
     "@types/vue": "^1.0.31",
+    "@unocss/eslint-plugin": "^66.5.1",
     "@vitejs/plugin-vue": "^5.2.4",
     "@vue/tsconfig": "^0.8.1",
-    "@unocss/eslint-plugin": "^66.5.1",
-    "eslint-plugin-format": "^1.0.1",
     "eslint": "^9.35.0",
+    "eslint-plugin-format": "^1.0.1",
     "npm-run-all2": "^7.0.2",
     "typescript": "^5.9.2",
     "vite": "^7.1.5",
