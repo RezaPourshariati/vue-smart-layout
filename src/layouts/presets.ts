@@ -167,6 +167,7 @@ export const layoutPresets: Record<string, LayoutPreset> = {
       name: 'landing',
       header: {
         type: 'hero',
+        color: '#7aa637',
         transparent: true,
         showNavigation: true,
         height: '6rem',
