@@ -1,8 +1,8 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
-    "./index.html",
-    "./src/**/*.{vue,js,ts,jsx,tsx}",
+    './index.html',
+    './src/**/*.{vue,js,ts,jsx,tsx}',
   ],
   theme: {
     extend: {
@@ -22,14 +22,14 @@ export default {
           DEFAULT: '#9c27b0',
           dark: '#7b1fa2',
           light: '#ba68c8',
-        }
+        },
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
       },
       spacing: {
-        '18': '4.5rem',
-        '88': '22rem',
+        18: '4.5rem',
+        88: '22rem',
       },
       animation: {
         'fade-in': 'fadeIn 0.6s ease-in-out',
@@ -60,7 +60,7 @@ export default {
       gridTemplateColumns: {
         'auto-fit': 'repeat(auto-fit, minmax(300px, 1fr))',
         'auto-fill': 'repeat(auto-fill, minmax(250px, 1fr))',
-      }
+      },
     },
   },
   plugins: [],
