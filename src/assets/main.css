@@ -71,16 +71,42 @@
   --font-family-mono: var(--font-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
+/*@media (prefers-color-scheme: dark) {*/
+/*  :root {*/
+/*    --theme-text-primary: var(--color-gray-100);*/
+/*  }*/
+/*}*/
+
+/* Dark mode CSS variables migrated from themes/_dark-mode.scss */
+:root {
+    --theme-bg-primary: var(--color-white);
+    --theme-bg-secondary: var(--color-gray-50);
+    --theme-bg-tertiary: var(--color-gray-100);
+    --theme-text-secondary: var(--color-gray-600);
+    --theme-text-muted: var(--color-gray-500);
+    --theme-border-primary: var(--color-gray-200);
+    --theme-border-secondary: var(--color-gray-300);
+    --theme-shadow: rgba(0,0,0,0.1);
+    --theme-shadow-lg: rgba(0,0,0,0.15);
+}
+
+[data-theme="dark"] {
+    --theme-bg-primary: var(--color-gray-900);
+    --theme-bg-secondary: var(--color-gray-800);
+    --theme-bg-tertiary: var(--color-gray-700);
     --theme-text-primary: var(--color-gray-100);
-  }
+    --theme-text-secondary: var(--color-gray-300);
+    --theme-text-muted: var(--color-gray-400);
+    --theme-border-primary: var(--color-gray-700);
+    --theme-border-secondary: var(--color-gray-600);
+    --theme-shadow: rgba(0,0,0,0.3);
+    --theme-shadow-lg: rgba(0,0,0,0.4);
 }
 
 /* Optional: base font family uses theme token */
 @layer base {
   html {
-    font-family: var(--font-sans);
+    font-family: var(--font-sans), sans-serif;
   }
   /* Reset and base typography migrated from SCSS */
   *, *::before, *::after { box-sizing: border-box }
@@ -92,7 +118,7 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
-    font-family: var(--font-sans);
+    font-family: var(--font-sans), sans-serif;
     font-size: 1rem;
     font-weight: var(--font-weight-normal);
     color: var(--theme-text-primary);
@@ -130,33 +156,7 @@
 /* App root theme styles migrated from App.vue */
 .theme-app {
   color: var(--theme-text-primary);
-  font-family: var(--font-family-primary);
-}
-
-/* Dark mode CSS variables migrated from themes/_dark-mode.scss */
-:root {
-  --theme-bg-primary: var(--color-white);
-  --theme-bg-secondary: var(--color-gray-50);
-  --theme-bg-tertiary: var(--color-gray-100);
-  --theme-text-secondary: var(--color-gray-600);
-  --theme-text-muted: var(--color-gray-500);
-  --theme-border-primary: var(--color-gray-200);
-  --theme-border-secondary: var(--color-gray-300);
-  --theme-shadow: rgba(0,0,0,0.1);
-  --theme-shadow-lg: rgba(0,0,0,0.15);
-}
-
-[data-theme="dark"] {
-  --theme-bg-primary: var(--color-gray-900);
-  --theme-bg-secondary: var(--color-gray-800);
-  --theme-bg-tertiary: var(--color-gray-700);
-  --theme-text-primary: var(--color-gray-100);
-  --theme-text-secondary: var(--color-gray-300);
-  --theme-text-muted: var(--color-gray-400);
-  --theme-border-primary: var(--color-gray-700);
-  --theme-border-secondary: var(--color-gray-600);
-  --theme-shadow: rgba(0,0,0,0.3);
-  --theme-shadow-lg: rgba(0,0,0,0.4);
+  font-family: var(--font-family-primary), sans-serif;
 }
 
 /* Additional keyframes from animations/_keyframes.scss */

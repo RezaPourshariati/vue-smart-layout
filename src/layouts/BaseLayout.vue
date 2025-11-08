@@ -22,6 +22,8 @@ const layoutClasses = computed(() => [
 
 const contentClasses = computed(() => [
   'layout-content',
+  'mx-auto',
+  'my-0',
   props.config.container?.className
 ])
 

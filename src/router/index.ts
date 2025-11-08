@@ -59,14 +59,15 @@ const routes: RouteRecordRaw[] = [
       layout: {
         name: 'profile',
         header: {
-          type: 'standard',
+          type: 'hero',
           color: '#9c27b0',
           showNavigation: true,
+          transparent: true,
           title: 'User Profile',
           height: '4rem',
         },
         sidebar: {
-          position: 'right',
+          position: 'left',
           width: '300px',
           content: ['info'],
           variant: 'info',
