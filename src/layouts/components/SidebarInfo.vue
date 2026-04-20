@@ -1,6 +1,16 @@
+<script setup lang="ts">
+interface Props {
+  variant?: string
+}
+
+defineProps<Props>()
+</script>
+
 <template>
   <div class="sidebar-info">
-    <h3 class="sidebar-title">Information</h3>
+    <h3 class="sidebar-title">
+      Information
+    </h3>
     <div class="info-card">
       <div class="info-item">
         <span class="info-label">Total Items:</span>
@@ -17,14 +27,6 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-interface Props {
-  variant?: string
-}
-
-defineProps<Props>()
-</script>
 
 <style scoped>
 .sidebar-info {

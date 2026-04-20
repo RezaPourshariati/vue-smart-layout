@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import type { FooterConfig } from '../types'
+import { computed } from 'vue'
 
 interface Props {
   config: FooterConfig
@@ -10,11 +10,11 @@ const props = defineProps<Props>()
 
 const footerClasses = computed(() => [
   'layout-footer',
-  `footer-${props.config.variant || 'standard'}`
+  `footer-${props.config.variant || 'standard'}`,
 ])
 
 const footerStyles = computed(() => ({
-  backgroundColor: props.config.color || undefined
+  backgroundColor: props.config.color || undefined,
 }))
 </script>
 
@@ -24,11 +24,17 @@ const footerStyles = computed(() => ({
     :style="footerStyles"
   >
     <div class="footer-content">
-      <div v-if="config.variant === 'minimal'" class="footer-minimal">
+      <div
+        v-if="config.variant === 'minimal'"
+        class="footer-minimal"
+      >
         <p>&copy; 2024 Vue Smart Layout. All rights reserved.</p>
       </div>
 
-      <div v-else-if="config.variant === 'extended'" class="footer-extended">
+      <div
+        v-else-if="config.variant === 'extended'"
+        class="footer-extended"
+      >
         <div class="footer-section">
           <h4>Company</h4>
           <ul>
@@ -54,7 +60,10 @@ const footerStyles = computed(() => ({
         </div>
       </div>
 
-      <div v-else class="footer-standard">
+      <div
+        v-else
+        class="footer-standard"
+      >
         <div class="footer-links">
           <a href="/privacy">Privacy</a>
           <a href="/terms">Terms</a>

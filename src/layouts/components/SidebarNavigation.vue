@@ -1,17 +1,3 @@
-<template>
-  <div class="sidebar-navigation">
-    <h3 class="sidebar-title">Navigation</h3>
-    <ul class="nav-list">
-      <li v-for="link in navigationLinks" :key="link.path">
-        <router-link :to="link.path" class="nav-item">
-          <span class="nav-icon">{{ link.icon }}</span>
-          <span class="nav-text">{{ link.name }}</span>
-        </router-link>
-      </li>
-    </ul>
-  </div>
-</template>
-
 <script setup lang="ts">
 interface Props {
   variant?: string
@@ -23,9 +9,31 @@ const navigationLinks = [
   { name: 'Dashboard', path: '/dashboard', icon: '📊' },
   { name: 'Profile', path: '/profile', icon: '👤' },
   { name: 'Settings', path: '/settings', icon: '⚙️' },
-  { name: 'Help', path: '/help', icon: '❓' }
+  { name: 'Help', path: '/help', icon: '❓' },
 ]
 </script>
+
+<template>
+  <div class="sidebar-navigation">
+    <h3 class="sidebar-title">
+      Navigation
+    </h3>
+    <ul class="nav-list">
+      <li
+        v-for="link in navigationLinks"
+        :key="link.path"
+      >
+        <router-link
+          :to="link.path"
+          class="nav-item"
+        >
+          <span class="nav-icon">{{ link.icon }}</span>
+          <span class="nav-text">{{ link.name }}</span>
+        </router-link>
+      </li>
+    </ul>
+  </div>
+</template>
 
 <style scoped>
 .sidebar-navigation {

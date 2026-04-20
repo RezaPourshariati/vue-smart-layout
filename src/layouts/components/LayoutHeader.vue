@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import type { HeaderConfig } from '../types'
+import { computed } from 'vue'
 import LayoutNavigation from './LayoutNavigation.vue'
 
 interface Props {
@@ -24,28 +24,28 @@ const headerTypeClasses = computed(() => {
 
 const headerStyles = computed(() => ({
   backgroundColor: props.config.color || undefined,
-  height: props.config.height || undefined
+  height: props.config.height || undefined,
 }))
 </script>
 
 <template>
   <!-- ✅ 90% TailwindCSS + 10% custom complex styles -->
   <header
+    class="w-full flex items-center transition-all duration-300"
     :class="[
-      'w-full flex items-center transition-all duration-300',
       headerTypeClasses,
-      { 'header-glassmorphism': config.transparent }
+      { 'header-glassmorphism': config.transparent },
     ]"
     :style="headerStyles"
   >
     <div class="w-full max-w-6xl mx-auto px-8 flex justify-between items-center">
       <h1
         v-if="config.title"
+        class="font-semibold m-0"
         :class="[
-          'font-semibold m-0',
           config.type === 'hero'
             ? 'text-2xl md:text-3xl text-white'
-            : 'text-xl md:text-2xl text-gray-900'
+            : 'text-xl md:text-2xl text-gray-900',
         ]"
       >
         {{ config.title }}
@@ -76,7 +76,7 @@ const headerStyles = computed(() => ({
 }
 
 /* Dark mode glassmorphism */
-[data-theme="dark"] .header-glassmorphism {
+[data-theme='dark'] .header-glassmorphism {
   background: rgba(0, 0, 0, 0.7);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }

@@ -19,7 +19,9 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-auto-fit gap-6">
       <!-- Analytics Card -->
       <div class="dashboard-card-animated bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
-        <h3 class="text-lg md:text-xl font-semibold text-gray-900 mb-2">📊 Analytics</h3>
+        <h3 class="text-lg md:text-xl font-semibold text-gray-900 mb-2">
+          📊 Analytics
+        </h3>
         <p class="text-gray-600 leading-relaxed mb-4">
           View your site analytics and performance metrics
         </p>
@@ -31,7 +33,9 @@
 
       <!-- Users Card -->
       <div class="dashboard-card-animated bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
-        <h3 class="text-lg md:text-xl font-semibold text-gray-900 mb-2">👥 Users</h3>
+        <h3 class="text-lg md:text-xl font-semibold text-gray-900 mb-2">
+          👥 Users
+        </h3>
         <p class="text-gray-600 leading-relaxed mb-4">
           Manage user accounts and permissions
         </p>
@@ -43,7 +47,9 @@
 
       <!-- Settings Card -->
       <div class="dashboard-card-animated bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
-        <h3 class="text-lg md:text-xl font-semibold text-gray-900 mb-2">⚙️ Settings</h3>
+        <h3 class="text-lg md:text-xl font-semibold text-gray-900 mb-2">
+          ⚙️ Settings
+        </h3>
         <p class="text-gray-600 leading-relaxed mb-4">
           Configure your application settings
         </p>
@@ -54,7 +60,9 @@
 
       <!-- Recent Activity Card -->
       <div class="dashboard-card-animated bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
-        <h3 class="text-lg md:text-xl font-semibold text-gray-900 mb-4">📝 Recent Activity</h3>
+        <h3 class="text-lg md:text-xl font-semibold text-gray-900 mb-4">
+          📝 Recent Activity
+        </h3>
         <ul class="space-y-2">
           <li class="py-2 border-b border-gray-100 last:border-b-0 text-gray-600 text-sm">
             User John logged in
@@ -77,7 +85,7 @@
 <style scoped>
 .dashboard-card-animated {
   opacity: 0;
-    animation: fadeIn 0.6s ease-in-out 0.1s forwards;
+  animation: fadeIn 0.6s ease-in-out 0.1s forwards;
 
   &:hover {
     transform: translateY(-2px);

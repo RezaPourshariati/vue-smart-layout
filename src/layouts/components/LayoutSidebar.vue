@@ -1,3 +1,45 @@
+<script setup lang="ts">
+import type { SidebarConfig } from '../types'
+import { computed, ref } from 'vue'
+import SidebarFilters from './SidebarFilters.vue'
+import SidebarInfo from './SidebarInfo.vue'
+import SidebarNavigation from './SidebarNavigation.vue'
+
+interface Props {
+  config: SidebarConfig
+}
+
+const props = defineProps<Props>()
+
+const isCollapsed = ref(false)
+
+const sidebarClasses = computed(() => [
+  'layout-sidebar',
+  `sidebar-${props.config.position}`,
+  `sidebar-${props.config.variant}`,
+  {
+    'sidebar-collapsed': isCollapsed.value,
+  },
+])
+
+const sidebarStyles = computed(() => ({
+  width: isCollapsed.value ? '60px' : (props.config.width || '250px'),
+}))
+
+function getSectionComponent(section: string) {
+  const components: Record<string, typeof SidebarNavigation | typeof SidebarFilters | typeof SidebarInfo> = {
+    navigation: SidebarNavigation,
+    filters: SidebarFilters,
+    info: SidebarInfo,
+  }
+  return components[section] || SidebarInfo
+}
+
+function toggleCollapse() {
+  isCollapsed.value = !isCollapsed.value
+}
+</script>
+
 <template>
   <aside
     :class="sidebarClasses"
@@ -18,55 +60,13 @@
 
     <button
       v-if="config.collapsible"
-      @click="toggleCollapse"
       class="collapse-button"
+      @click="toggleCollapse"
     >
       {{ isCollapsed ? '→' : '←' }}
     </button>
   </aside>
 </template>
-
-<script setup lang="ts">
-import { computed, ref } from 'vue'
-import type { SidebarConfig } from '../types'
-import SidebarNavigation from './SidebarNavigation.vue'
-import SidebarFilters from './SidebarFilters.vue'
-import SidebarInfo from './SidebarInfo.vue'
-
-interface Props {
-  config: SidebarConfig
-}
-
-const props = defineProps<Props>()
-
-const isCollapsed = ref(false)
-
-const sidebarClasses = computed(() => [
-  'layout-sidebar',
-  `sidebar-${props.config.position}`,
-  `sidebar-${props.config.variant}`,
-  {
-    'sidebar-collapsed': isCollapsed.value
-  }
-])
-
-const sidebarStyles = computed(() => ({
-  width: isCollapsed.value ? '60px' : (props.config.width || '250px')
-}))
-
-const getSectionComponent = (section: string) => {
-  const components: Record<string, typeof SidebarNavigation | typeof SidebarFilters | typeof SidebarInfo> = {
-    'navigation': SidebarNavigation,
-    'filters': SidebarFilters,
-    'info': SidebarInfo
-  }
-  return components[section] || SidebarInfo
-}
-
-const toggleCollapse = () => {
-  isCollapsed.value = !isCollapsed.value
-}
-</script>
 
 <style scoped>
 .layout-sidebar {

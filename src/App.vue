@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import AppLayout from "@/layouts/AppLayout.vue"
+import AppLayout from '@/layouts/AppLayout.vue'
 // import '@/assets/styles/main.scss'
 </script>
 

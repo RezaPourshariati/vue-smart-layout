@@ -1,11 +1,10 @@
 <script setup lang="ts">
-
 interface Props {
   variant?: 'minimal' | 'standard' | 'hero'
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  variant: 'standard'
+  variant: 'standard',
 })
 
 // In a real app, this would come from a store or API
@@ -19,7 +18,7 @@ const navigationLinks = [
   // { name: 'Wow', path: '/wow' }
 ]
 
-const getLinkClasses = (variant: string) => {
+function getLinkClasses(variant: string) {
   const baseClasses = 'hover:bg-gray-100 active:bg-gray-200'
 
   switch (variant) {
@@ -41,9 +40,9 @@ const getLinkClasses = (variant: string) => {
       v-for="link in navigationLinks"
       :key="link.path"
       :to="link.path"
+      class="nav-link-animated px-3 py-2 rounded-md text-sm font-medium transition-all duration-200"
       :class="[
-        'nav-link-animated px-3 py-2 rounded-md text-sm font-medium transition-all duration-200',
-        getLinkClasses(props.variant)
+        getLinkClasses(props.variant),
       ]"
     >
       {{ link.name }}
@@ -54,7 +53,9 @@ const getLinkClasses = (variant: string) => {
 <style scoped>
 /* ✅ Only complex router-link active states (5% of styling) */
 
-.nav-link-animated { position: relative }
+.nav-link-animated {
+  position: relative;
+}
 
 .nav-link-animated.router-link-active {
   color: var(--color-emerald-600);
@@ -84,7 +85,11 @@ const getLinkClasses = (variant: string) => {
 }
 
 @keyframes expandUnderline {
-  from { width: 0 }
-  to { width: 80% }
+  from {
+    width: 0;
+  }
+  to {
+    width: 80%;
+  }
 }
 </style>

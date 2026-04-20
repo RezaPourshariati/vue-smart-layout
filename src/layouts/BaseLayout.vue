@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import type { LayoutConfig } from './types'
+import { computed } from 'vue'
+import LayoutFooter from './components/LayoutFooter.vue'
 import LayoutHeader from './components/LayoutHeader.vue'
 import LayoutSidebar from './components/LayoutSidebar.vue'
-import LayoutFooter from './components/LayoutFooter.vue'
 
 interface Props {
   config: LayoutConfig
@@ -16,15 +16,15 @@ const layoutClasses = computed(() => [
   props.config.className,
   {
     'layout-with-sidebar': props.config.sidebar,
-    'layout-full-height': props.config.container?.fullHeight
-  }
+    'layout-full-height': props.config.container?.fullHeight,
+  },
 ])
 
 const contentClasses = computed(() => [
   'layout-content',
   'mx-auto',
   'my-0',
-  props.config.container?.className
+  props.config.container?.className,
 ])
 
 const contentStyles = computed(() => {
@@ -59,7 +59,10 @@ const contentStyles = computed(() => {
       />
 
       <!-- Main Content Area -->
-      <main :class="contentClasses" :style="contentStyles">
+      <main
+        :class="contentClasses"
+        :style="contentStyles"
+      >
         <div class="content-container">
           <slot />
         </div>

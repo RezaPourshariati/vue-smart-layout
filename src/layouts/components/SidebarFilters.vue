@@ -8,7 +8,9 @@ defineProps<Props>()
 
 <template>
   <div class="sidebar-filters">
-    <h3 class="sidebar-title">Filters</h3>
+    <h3 class="sidebar-title">
+      Filters
+    </h3>
     <div class="filter-group">
       <label class="filter-label">Category</label>
       <select class="filter-select">
@@ -23,13 +25,13 @@ defineProps<Props>()
       <label class="filter-label">Status</label>
       <div class="checkbox-group">
         <label class="checkbox-label">
-          <input type="checkbox" /> Active
+          <input type="checkbox"> Active
         </label>
         <label class="checkbox-label">
-          <input type="checkbox" /> Pending
+          <input type="checkbox"> Pending
         </label>
         <label class="checkbox-label">
-          <input type="checkbox" /> Completed
+          <input type="checkbox"> Completed
         </label>
       </div>
     </div>
