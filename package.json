@@ -6,36 +6,31 @@
   "packageManager": "pnpm@10.17.0",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "dev": "vite",
-    "build": "run-p type-check \"build-only {@}\" --",
-    "preview": "vite preview",
-    "build-only": "vite build",
-    "type-check": "vue-tsc --build",
-    "lint": "eslint .",
-    "lint:fix": "eslint ./src --fix"
-  },
-  "dependencies": {
-    "@tailwindcss/vite": "^4.1.13",
-    "sass": "^1.86.1",
-    "tailwindcss": "^4.1.13",
-    "vue": "^3.5.13",
-    "vue-router": "^4.5.0"
+    "dev": "pnpm --dir front-end dev",
+    "dev:front-end": "pnpm --dir front-end dev",
+    "dev:back-end": "pnpm --dir back-end dev",
+    "dev:full": "run-p dev:front-end dev:back-end",
+    "preview": "pnpm --dir front-end preview",
+    "build:front-end": "pnpm --dir front-end build",
+    "build:back-end": "pnpm --dir back-end build",
+    "build": "run-p type-check build:front-end build:back-end",
+    "type-check:front-end": "pnpm --dir front-end type-check",
+    "type-check:back-end": "pnpm --dir back-end type-check",
+    "type-check": "run-p type-check:front-end type-check:back-end",
+    "lint": "run-p lint:front-end lint:back-end",
+    "lint:front-end": "eslint \"./front-end/src/**/*.{ts,vue}\"",
+    "lint:back-end": "eslint ./back-end/src",
+    "lint:fix": "run-p lint:fix:front-end lint:fix:back-end",
+    "lint:fix:front-end": "eslint \"./front-end/src/**/*.{ts,vue}\" --fix",
+    "lint:fix:back-end": "eslint ./back-end/src --fix"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^5.3.0",
-    "@tsconfig/node22": "^22.0.0",
     "@types/node": "^24.5.1",
-    "@types/vue": "^1.0.31",
     "@unocss/eslint-plugin": "^66.5.1",
-    "@vitejs/plugin-vue": "^5.2.4",
-    "@vue/tsconfig": "^0.8.1",
     "eslint": "^9.35.0",
-    "unocss": "^66.6.8",
     "eslint-plugin-format": "^1.0.1",
     "npm-run-all2": "^7.0.2",
-    "typescript": "^5.9.2",
-    "vite": "^7.1.5",
-    "vite-plugin-vue-devtools": "^7.6.8",
-    "vue-tsc": "^2.1.10"
+    "typescript": "^5.9.2"
   }
 }

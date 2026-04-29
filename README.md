@@ -1,39 +1,75 @@
 # vue-smart-layout
 
-This template should help get you started developing with Vue 3 in Vite.
+Smart Layout is organized as a pnpm workspace with separate front-end and back-end packages.
 
-## Recommended IDE Setup
+## Project Structure
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+- `front-end`: Vue + Vite application
+- `back-end`: Express + TypeScript API
+- root: workspace orchestration, shared lint config, CI workflows
 
-## Type Support for `.vue` Imports in TS
+## Prerequisites
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+- Node.js 22+
+- pnpm 10+
 
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
+## Install
 
 ```sh
-npm install
+pnpm install
 ```
 
-### Compile and Hot-Reload for Development
+## Development
+
+Run front-end only:
 
 ```sh
-npm run dev
+pnpm dev
 ```
 
-### Type-Check, Compile and Minify for Production
+Run both front-end and back-end:
 
 ```sh
-npm run build
+pnpm dev:full
 ```
 
-### Lint with [ESLint](https://eslint.org/)
+Run packages independently:
 
 ```sh
-npm run lint
+pnpm dev:front-end
+pnpm dev:back-end
+```
+
+## Quality Checks
+
+Lint both packages:
+
+```sh
+pnpm lint
+```
+
+Type-check both packages:
+
+```sh
+pnpm type-check
+```
+
+## Build
+
+Build front-end:
+
+```sh
+pnpm build:front-end
+```
+
+Build back-end:
+
+```sh
+pnpm build:back-end
+```
+
+Build all (type-check + front-end build):
+
+```sh
+pnpm build
 ```

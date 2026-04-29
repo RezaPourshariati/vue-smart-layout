@@ -1,22 +1,2 @@
-import {
-  defineConfig,
-  presetAttributify,
-  presetIcons,
-  transformerDirectives,
-  transformerVariantGroup,
-} from 'unocss'
-
-export default defineConfig({
-  shortcuts: [
-  ],
-  presets: [
-    presetAttributify(),
-    presetIcons({
-      scale: 1.2,
-    }),
-  ],
-  transformers: [
-    transformerDirectives(),
-    transformerVariantGroup(),
-  ],
-})
+// we don't need to import it in the server
+export { default } from './front-end/uno.config'
