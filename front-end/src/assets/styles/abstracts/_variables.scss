@@ -1,0 +1,181 @@
+// ==========================================================================
+// VARIABLES
+// ==========================================================================
+
+// Brand Colors
+// --------------------------------------------------------------------------
+$color-primary: #42b983;
+$color-primary-dark: #369970;
+$color-primary-light: #5fcf9a;
+
+$color-secondary: #2c3e50;
+$color-secondary-dark: #1a252f;
+$color-secondary-light: #34495e;
+
+$color-accent: #9c27b0;
+$color-accent-dark: #7b1fa2;
+$color-accent-light: #ba68c8;
+
+// Neutral Colors
+// --------------------------------------------------------------------------
+$color-white: #ffffff;
+$color-gray-50: #fafafa;
+$color-gray-100: #f8f9fa;
+$color-gray-200: #e9ecef;
+$color-gray-300: #dee2e6;
+$color-gray-400: #ced4da;
+$color-gray-500: #6c757d;
+$color-gray-600: #495057;
+$color-gray-700: #343a40;
+$color-gray-800: #212529;
+$color-gray-900: #1a1a1a;
+$color-black: #000000;
+
+// Semantic Colors
+// --------------------------------------------------------------------------
+$color-success: #28a745;
+$color-warning: #ffc107;
+$color-danger: #dc3545;
+$color-info: #17a2b8;
+
+// Text Colors
+// --------------------------------------------------------------------------
+$color-text-primary: $color-gray-800;
+$color-text-secondary: $color-gray-600;
+$color-text-muted: $color-gray-500;
+$color-text-inverse: $color-white;
+
+// Background Colors
+// --------------------------------------------------------------------------
+$color-background: $color-white;
+$color-background-secondary: $color-gray-100;
+$color-background-muted: $color-gray-200;
+$color-background-dark: $color-gray-900;
+
+// Border Colors
+// --------------------------------------------------------------------------
+$color-border: $color-gray-300;
+$color-border-light: $color-gray-200;
+$color-border-dark: $color-gray-400;
+
+// Typography
+// --------------------------------------------------------------------------
+$font-family-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+$font-family-secondary: 'Roboto', sans-serif;
+$font-family-mono: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+
+// Font Sizes
+$font-size-xs: 0.75rem;   // 12px
+$font-size-sm: 0.875rem;  // 14px
+$font-size-base: 1rem;    // 16px
+$font-size-lg: 1.125rem;  // 18px
+$font-size-xl: 1.25rem;   // 20px
+$font-size-2xl: 1.5rem;   // 24px
+$font-size-3xl: 1.875rem; // 30px
+$font-size-4xl: 2.25rem;  // 36px
+$font-size-5xl: 3rem;     // 48px
+$font-size-6xl: 4rem;     // 64px
+
+// Font sizes map for mixins
+$font-sizes: (
+  xs: $font-size-xs,
+  sm: $font-size-sm,
+  base: $font-size-base,
+  lg: $font-size-lg,
+  xl: $font-size-xl,
+  2xl: $font-size-2xl,
+  3xl: $font-size-3xl,
+  4xl: $font-size-4xl,
+  5xl: $font-size-5xl,
+  6xl: $font-size-6xl
+);
+
+// Font Weights
+$font-weight-light: 300;
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+$font-weight-extrabold: 800;
+
+// Line Heights
+$line-height-tight: 1.2;
+$line-height-normal: 1.5;
+$line-height-relaxed: 1.6;
+$line-height-loose: 2;
+
+// Breakpoints
+// --------------------------------------------------------------------------
+$breakpoints: (
+  xs: 0,
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px,
+  xxl: 1400px
+);
+
+// Container Max Widths
+// --------------------------------------------------------------------------
+$container-max-widths: (
+  sm: 540px,
+  md: 720px,
+  lg: 960px,
+  xl: 1140px,
+  xxl: 1320px
+);
+
+// Spacing Scale
+// --------------------------------------------------------------------------
+$spacing-unit: 0.25rem; // 4px base unit
+
+$spacing-0: 0;
+$spacing-1: $spacing-unit;      // 4px
+$spacing-2: $spacing-unit * 2;  // 8px
+$spacing-3: $spacing-unit * 3;  // 12px
+$spacing-4: $spacing-unit * 4;  // 16px
+$spacing-5: $spacing-unit * 5;  // 20px
+$spacing-6: $spacing-unit * 6;  // 24px
+$spacing-8: $spacing-unit * 8;  // 32px
+$spacing-10: $spacing-unit * 10; // 40px
+$spacing-12: $spacing-unit * 12; // 48px
+$spacing-16: $spacing-unit * 16; // 64px
+$spacing-20: $spacing-unit * 20; // 80px
+$spacing-24: $spacing-unit * 24; // 96px
+$spacing-32: $spacing-unit * 32; // 128px
+
+// Border Radius
+// --------------------------------------------------------------------------
+$border-radius-none: 0;
+$border-radius-sm: 0.125rem;   // 2px
+$border-radius-base: 0.25rem;  // 4px
+$border-radius-md: 0.375rem;   // 6px
+$border-radius-lg: 0.5rem;     // 8px
+$border-radius-xl: 0.75rem;    // 12px
+$border-radius-2xl: 1rem;      // 16px
+$border-radius-full: 9999px;
+
+// Shadows
+// --------------------------------------------------------------------------
+$shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+$shadow-base: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+$shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+$shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+$shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+
+// Z-Index Scale
+// --------------------------------------------------------------------------
+$z-index-dropdown: 1000;
+$z-index-sticky: 1020;
+$z-index-fixed: 1030;
+$z-index-modal-backdrop: 1040;
+$z-index-modal: 1050;
+$z-index-popover: 1060;
+$z-index-tooltip: 1070;
+
+// Transitions
+// --------------------------------------------------------------------------
+$transition-fast: 150ms ease-in-out;
+$transition-base: 250ms ease-in-out;
+$transition-slow: 350ms ease-in-out;

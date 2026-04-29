@@ -1,0 +1,8 @@
+// ==========================================================================
+// ABSTRACTS INDEX
+// ==========================================================================
+
+// Import essential abstracts only (TailwindCSS handles most utilities)
+@forward 'variables';
+@forward 'functions';
+@forward 'mixins-essential';

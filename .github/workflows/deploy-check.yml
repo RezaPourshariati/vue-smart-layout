@@ -1,0 +1,72 @@
+name: Deploy Check
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - 'front-end/**'
+      - 'back-end/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - 'tsconfig.json'
+      - 'eslint.config.mjs'
+      - 'uno.config.ts'
+      - '.github/workflows/**'
+  workflow_dispatch:
+
+jobs:
+  deploy-check-front-end:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint front-end
+        run: pnpm lint:front-end
+
+      - name: Type check front-end
+        run: pnpm type-check:front-end
+
+      - name: Build front-end
+        run: pnpm build:front-end
+
+  deploy-check-back-end:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint back-end
+        run: pnpm lint:back-end
+
+      - name: Build back-end
+        run: pnpm build:back-end

@@ -1,0 +1,134 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap");
+@import "tailwindcss";
+
+@theme {
+  /* Custom Colors */
+  --color-primary: #007bff;
+  --color-secondary: #6c757d;
+  --color-success: #28a745;
+  --color-danger: #ff4500;
+  --color-warning: #ffc107;
+  --color-info: #17a2b8;
+  
+  --color-dark-blue: #0a1930;
+  --color-light-blue: #1f93ff;
+  --color-purple: #9d0191;
+  --color-orange: #ff7722;
+  --color-dark: #333;
+  --color-grey: #eee;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 5px 15px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.05);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 10px 10px -5px rgb(0 0 0 / 0.04);
+}
+
+/* Base Reset & Typography */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  scroll-behavior: smooth;
+}
+
+html {
+  font-size: 62.5%; /* 1rem = 10px */
+}
+
+body {
+  @apply font-sans bg-gray-200 text-base;
+  font-family: "Poppins", sans-serif;
+}
+
+/* Typography */
+h1, h2, h3, h4 {
+  @apply font-medium text-[#333] mb-4 leading-tight;
+}
+
+h1 { @apply text-[4rem]; }
+h2 { @apply text-[3rem]; }
+h3 { @apply text-[2.5rem]; }
+h4 { @apply text-[2rem]; }
+
+p {
+  @apply text-[1.5rem] font-light leading-relaxed text-[#333];
+}
+
+a {
+  @apply text-[1.4rem] no-underline transition-all duration-200;
+}
+
+a:hover {
+  @apply text-[#ff4500];
+}
+
+ul {
+  @apply list-none;
+}
+
+/* Sections & Containers */
+section {
+  @apply w-full py-16;
+}
+
+.container {
+  @apply max-w-[1000px] mx-auto px-5;
+}
+
+/* Custom Animation Keyframes */
+@keyframes slide-up {
+  0% {
+    transform: translateY(-5rem);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-down {
+  0% {
+    transform: translateY(5rem);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+/* Pagination */
+.pagination {
+  @apply flex justify-center items-center list-none my-8 text-[1rem];
+}
+
+.pagination .page-num {
+  @apply px-[10px] py-[5px] cursor-pointer rounded border border-[#333] text-[#333] mx-[2px] font-normal;
+}
+
+.pagination .page-num:hover {
+  @apply text-white bg-[#1f93ff];
+}
+
+.activePage {
+  @apply text-white bg-[#1f93ff] h-full;
+}
+
+/* Active Navigation Link */
+.active {
+  @apply relative text-[#ff4500];
+}
+
+.active::after {
+  @apply content-[''] absolute left-0 bottom-[-3px] w-full h-[2px] bg-white;
+}
+
+/* Quill Editor (if used) */
+.ql-editor {
+  min-height: 200px;
+}
+
+/* Responsive Utilities */
+@media screen and (max-width: 600px) {
+  .--flex-dir-column {
+    @apply flex-col;
+  }
+}

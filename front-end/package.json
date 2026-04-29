@@ -1,0 +1,35 @@
+{
+  "name": "smart-layout-front-end",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "type-check": "vue-tsc --build tsconfig.app.json"
+  },
+  "dependencies": {
+    "@primeuix/themes": "^2.0.3",
+    "@tailwindcss/vite": "^4.1.13",
+    "pinia": "^3.0.4",
+    "primeicons": "^7.0.0",
+    "primevue": "^4.5.5",
+    "sass": "^1.86.1",
+    "tailwindcss": "^4.1.13",
+    "vue": "^3.5.13",
+    "vue-router": "^4.5.0"
+  },
+  "devDependencies": {
+    "@tsconfig/node22": "^22.0.0",
+    "@types/node": "^24.5.1",
+    "@types/vue": "^1.0.31",
+    "@vitejs/plugin-vue": "^5.2.4",
+    "@vue/tsconfig": "^0.8.1",
+    "typescript": "^5.9.2",
+    "unocss": "^66.6.8",
+    "vite": "^7.1.5",
+    "vite-plugin-vue-devtools": "^7.6.8",
+    "vue-tsc": "^2.1.10"
+  }
+}

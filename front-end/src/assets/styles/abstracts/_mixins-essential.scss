@@ -1,0 +1,168 @@
+// ==========================================================================
+// ESSENTIAL MIXINS (Complex functionality not covered by TailwindCSS)
+// ==========================================================================
+
+@use 'variables' as *;
+@use 'sass:map';
+@use 'sass:color';
+
+// Responsive Mixins (Essential for existing files)
+// --------------------------------------------------------------------------
+@mixin respond-to($breakpoint) {
+  @if map.has-key($breakpoints, $breakpoint) {
+    $breakpoint-value: map.get($breakpoints, $breakpoint);
+    @media (min-width: $breakpoint-value) {
+      @content;
+    }
+  } @else {
+    @warn "Invalid breakpoint: #{$breakpoint}.";
+  }
+}
+
+@mixin respond-down($breakpoint) {
+  @if map.has-key($breakpoints, $breakpoint) {
+    $breakpoint-value: map.get($breakpoints, $breakpoint);
+    @media (max-width: $breakpoint-value - 1px) {
+      @content;
+    }
+  }
+}
+
+@mixin respond-between($min-breakpoint, $max-breakpoint) {
+  @if map.has-key($breakpoints, $min-breakpoint) and map.has-key($breakpoints, $max-breakpoint) {
+    $min-value: map.get($breakpoints, $min-breakpoint);
+    $max-value: map.get($breakpoints, $max-breakpoint);
+    @media (min-width: $min-value) and (max-width: $max-value - 1px) {
+      @content;
+    }
+  }
+}
+
+// ❌ REMOVED: Container Mixin (TailwindCSS handles this better)
+// Use TailwindCSS instead:
+// - container → container mx-auto px-4
+// - container(sm) → container mx-auto px-4 max-w-sm
+// - container(md) → container mx-auto px-4 max-w-md
+// - container(lg) → container mx-auto px-4 max-w-lg
+// - container(xl) → container mx-auto px-4 max-w-xl
+
+// ❌ REMOVED: Layout Mixins (TailwindCSS handles these better)
+// Use TailwindCSS instead:
+// - flex-center → flex items-center justify-center
+// - flex-between → flex items-center justify-between  
+// - flex-column → flex flex-col
+// - grid → grid
+// - grid-responsive → grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6
+
+// ❌ REMOVED: Card, Button & Form Mixins (TailwindCSS handles these better)
+// Use TailwindCSS instead:
+// - card-base → bg-white border border-gray-200 rounded-md p-6 shadow-sm
+// - card-hover → transition-all hover:shadow-md hover:-translate-y-0.5
+// - button-base → inline-flex items-center justify-center border-0 rounded-md font-medium no-underline cursor-pointer transition-all disabled:opacity-60 disabled:cursor-not-allowed
+// - form-control → w-full p-3 border border-gray-300 rounded-md text-base transition-all focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:bg-gray-50 disabled:cursor-not-allowed
+
+// Complex Animation Mixins
+// --------------------------------------------------------------------------
+@mixin fade-in($duration: $transition-base, $delay: 0s) {
+  opacity: 0;
+  animation: fadeIn $duration ease-in-out $delay forwards;
+}
+
+@mixin slide-up($duration: $transition-base, $distance: 20px) {
+  opacity: 0;
+  transform: translateY($distance);
+  animation: slideUp $duration ease-out forwards;
+}
+
+@mixin bounce-in($duration: 0.6s) {
+  opacity: 0;
+  transform: scale(0.3);
+  animation: bounceIn $duration cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+}
+
+// Complex Layout Mixins
+// --------------------------------------------------------------------------
+@mixin aspect-ratio($width, $height) {
+  position: relative;
+  
+  &::before {
+    content: '';
+    display: block;
+    padding-top: ($height / $width) * 100%;
+  }
+  
+  > * {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+@mixin visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+// Theme Mixins
+// --------------------------------------------------------------------------
+@mixin theme-variant($theme: 'light') {
+  @if $theme == 'dark' {
+    --tw-bg-primary: #{$color-gray-900};
+    --tw-text-primary: #{$color-gray-100};
+    --tw-border-color: #{$color-gray-700};
+  } @else {
+    --tw-bg-primary: #{$color-white};
+    --tw-text-primary: #{$color-gray-900};
+    --tw-border-color: #{$color-gray-200};
+  }
+}
+
+// Complex Interactive States
+// --------------------------------------------------------------------------
+@mixin focus-ring($color: $color-primary) {
+  &:focus {
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 2px $color;
+  }
+  
+  &:focus:not(:focus-visible) {
+    box-shadow: none;
+  }
+}
+
+@mixin loading-shimmer {
+  background: linear-gradient(90deg, 
+    $color-gray-200 25%, 
+    $color-gray-100 50%, 
+    $color-gray-200 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+// Mathematical Functions for Complex Layouts
+// --------------------------------------------------------------------------
+@mixin fluid-type($min-size, $max-size, $min-vw: 320px, $max-vw: 1200px) {
+  $slope: ($max-size - $min-size) / ($max-vw - $min-vw);
+  $intersection: (-$min-vw * $slope) + $min-size;
+  
+  font-size: clamp(#{$min-size}, #{$intersection} + #{$slope * 100}vw, #{$max-size});
+}
+
+@mixin truncate-lines($lines: 2) {
+  display: -webkit-box;
+  -webkit-line-clamp: $lines;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

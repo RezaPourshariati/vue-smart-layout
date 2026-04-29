@@ -1,0 +1,133 @@
+// ==========================================================================
+// FOOTER LAYOUTS
+// ==========================================================================
+
+@use '../abstracts' as *;
+
+.layout-footer {
+  width: 100%;
+  border-top: 1px solid $color-border;
+  background: $color-background-secondary;
+  margin-top: auto;
+  
+  .footer-content {
+    // ✅ Use TailwindCSS classes directly in HTML: container mx-auto px-4
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: $spacing-8 1rem;
+  }
+}
+
+// Footer variants
+.footer-minimal {
+  .footer-content {
+    padding-top: $spacing-4;
+    padding-bottom: $spacing-4;
+    text-align: center;
+    
+    p {
+      margin: 0;
+      color: $color-text-muted;
+      font-size: $font-size-sm;
+    }
+  }
+}
+
+.footer-standard {
+  .footer-content {
+    // ✅ Use TailwindCSS classes directly in HTML: flex items-center justify-between flex-wrap
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: $spacing-4;
+    
+    @include respond-down(md) {
+      flex-direction: column;
+      text-align: center;
+    }
+  }
+  
+  .footer-links {
+    display: flex;
+    gap: $spacing-8;
+    
+    @include respond-down(md) {
+      justify-content: center;
+      gap: $spacing-6;
+    }
+    
+    a {
+      color: $color-text-muted;
+      text-decoration: none;
+      font-size: $font-size-sm;
+      transition: color $transition-base;
+      
+      &:hover {
+        color: $color-primary;
+      }
+    }
+  }
+  
+  p {
+    margin: 0;
+    color: $color-text-muted;
+    font-size: $font-size-sm;
+  }
+}
+
+.footer-extended {
+  .footer-content {
+    gap: $spacing-8;
+    // ✅ Use TailwindCSS classes directly in HTML: grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    
+    @media (min-width: 768px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    @media (min-width: 1024px) {
+      grid-template-columns: repeat(4, 1fr);
+    }
+    
+    @include respond-to(md) {
+      gap: $spacing-12;
+    }
+  }
+  
+  .footer-section {
+    h4 {
+      margin-bottom: $spacing-4;
+      color: $color-text-primary;
+      font-size: $font-size-base;
+      font-weight: $font-weight-semibold;
+    }
+    
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      
+      li {
+        margin-bottom: $spacing-2;
+        
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
+    
+    a {
+      color: $color-text-muted;
+      text-decoration: none;
+      font-size: $font-size-sm;
+      transition: color $transition-base;
+      
+      &:hover {
+        color: $color-primary;
+      }
+    }
+  }
+}

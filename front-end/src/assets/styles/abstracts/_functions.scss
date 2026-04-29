@@ -1,0 +1,194 @@
+// ==========================================================================
+// FUNCTIONS
+// ==========================================================================
+
+@use 'variables' as *;
+@use 'sass:map';
+
+// Color Functions
+// --------------------------------------------------------------------------
+
+// Get color from palette with optional opacity
+@function color($name, $opacity: 1) {
+  $color: null;
+  
+  // Primary colors
+  @if $name == 'primary' { $color: $color-primary; }
+  @else if $name == 'primary-dark' { $color: $color-primary-dark; }
+  @else if $name == 'primary-light' { $color: $color-primary-light; }
+  
+  // Secondary colors
+  @else if $name == 'secondary' { $color: $color-secondary; }
+  @else if $name == 'secondary-dark' { $color: $color-secondary-dark; }
+  @else if $name == 'secondary-light' { $color: $color-secondary-light; }
+  
+  // Gray scale
+  @else if $name == 'white' { $color: $color-white; }
+  @else if $name == 'gray-100' { $color: $color-gray-100; }
+  @else if $name == 'gray-200' { $color: $color-gray-200; }
+  @else if $name == 'gray-300' { $color: $color-gray-300; }
+  @else if $name == 'gray-400' { $color: $color-gray-400; }
+  @else if $name == 'gray-500' { $color: $color-gray-500; }
+  @else if $name == 'gray-600' { $color: $color-gray-600; }
+  @else if $name == 'gray-700' { $color: $color-gray-700; }
+  @else if $name == 'gray-800' { $color: $color-gray-800; }
+  @else if $name == 'gray-900' { $color: $color-gray-900; }
+  @else if $name == 'black' { $color: $color-black; }
+  
+  // Semantic colors
+  @else if $name == 'success' { $color: $color-success; }
+  @else if $name == 'warning' { $color: $color-warning; }
+  @else if $name == 'danger' { $color: $color-danger; }
+  @else if $name == 'info' { $color: $color-info; }
+  
+  @else {
+    @warn "Unknown color: #{$name}";
+    @return null;
+  }
+  
+  @if $opacity != 1 {
+    @return rgba($color, $opacity);
+  }
+  
+  @return $color;
+}
+
+// Spacing Functions
+// --------------------------------------------------------------------------
+
+// Get spacing value from scale
+@function spacing($multiplier) {
+  @return $spacing-unit * $multiplier;
+}
+
+// Convert px to rem
+@function rem($px) {
+  @return ($px / 16px) * 1rem;
+}
+
+// Convert rem to px
+@function px($rem) {
+  @return ($rem / 1rem) * 16px;
+}
+
+// Breakpoint Functions
+// --------------------------------------------------------------------------
+
+// Get breakpoint value
+@function breakpoint($name) {
+  @return map.get($breakpoints, $name);
+}
+
+// Check if breakpoint exists
+@function breakpoint-exists($name) {
+  @return map.has-key($breakpoints, $name);
+}
+
+// Math Functions
+// --------------------------------------------------------------------------
+
+// Power function (since Sass doesn't have native pow)
+@function pow($number, $exponent) {
+  $result: 1;
+  
+  @if $exponent > 0 {
+    @for $i from 1 through $exponent {
+      $result: $result * $number;
+    }
+  }
+  
+  @return $result;
+}
+
+// Strip units from a value
+@function strip-unit($value) {
+  @return $value / ($value * 0 + 1);
+}
+
+// Limit value between min and max (renamed to avoid conflict with CSS clamp())
+@function limit($value, $min, $max) {
+  @if $value < $min {
+    @return $min;
+  } @else if $value > $max {
+    @return $max;
+  }
+  @return $value;
+}
+
+// Typography Functions
+// --------------------------------------------------------------------------
+
+// Calculate line height based on font size
+@function line-height($font-size, $target-line-height: 1.5) {
+  @return $target-line-height * $font-size;
+}
+
+// Fluid typography scale
+@function fluid-type($min-size, $max-size, $min-viewport: 320px, $max-viewport: 1200px) {
+  $slope: ($max-size - $min-size) / ($max-viewport - $min-viewport);
+  $intersection: (-$min-viewport * $slope) + $min-size;
+  
+  // Use native CSS clamp() function for fluid typography
+  @return clamp(#{$min-size}, #{$intersection} + #{$slope * 100}vw, #{$max-size});
+}
+
+// Layout Functions
+// --------------------------------------------------------------------------
+
+// Calculate container width with padding
+@function container-width($breakpoint, $padding: $spacing-4) {
+  $base-width: map.get($container-max-widths, $breakpoint);
+  @if $base-width {
+    @return $base-width + ($padding * 2);
+  }
+  @return 100%;
+}
+
+// Grid column width calculation
+@function grid-width($columns, $total-columns: 12, $gap: $spacing-4) {
+  $column-width: 100% / $total-columns * $columns;
+  $gap-offset: ($gap * ($total-columns - 1)) / $total-columns;
+  @return calc(#{$column-width} - #{$gap-offset});
+}
+
+// Utility Functions
+// --------------------------------------------------------------------------
+
+// Deep merge maps
+@function map-deep-merge($map1, $map2) {
+  $result: $map1;
+  
+  @each $key, $value in $map2 {
+    @if type-of($value) == map and type-of(map.get($result, $key)) == map {
+      $result: map.merge($result, ($key: map-deep-merge(map.get($result, $key), $value)));
+    } @else {
+      $result: map.merge($result, ($key: $value));
+    }
+  }
+  
+  @return $result;
+}
+
+// Get nested map value
+@function map-deep-get($map, $keys...) {
+  @each $key in $keys {
+    $map: map.get($map, $key);
+  }
+  @return $map;
+}
+
+// Check if string contains substring
+@function str-contains($string, $substring) {
+  @return str-index($string, $substring) != null;
+}
+
+// Replace substring in string
+@function str-replace($string, $search, $replace: '') {
+  $index: str-index($string, $search);
+  
+  @if $index {
+    @return str-slice($string, 1, $index - 1) + $replace + str-replace(str-slice($string, $index + str-length($search)), $search, $replace);
+  }
+  
+  @return $string;
+}

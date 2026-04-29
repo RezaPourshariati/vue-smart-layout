@@ -1,0 +1,169 @@
+// ==========================================================================
+// NAVIGATION COMPONENTS
+// ==========================================================================
+
+@use '../abstracts' as *;
+
+.layout-navigation {
+  display: flex;
+  gap: $spacing-4;
+  align-items: center;
+  
+  @include respond-down(md) {
+    gap: $spacing-2;
+  }
+}
+
+.nav-link {
+  text-decoration: none;
+  padding: $spacing-2 $spacing-4;
+  border-radius: $border-radius-md;
+  transition: all $transition-base;
+  font-weight: $font-weight-medium;
+  font-size: $font-size-base;
+  white-space: nowrap;
+  
+  @include respond-down(md) {
+    padding: $spacing-2 $spacing-3;
+    font-size: $font-size-sm;
+  }
+}
+
+// Navigation variants
+.nav-standard {
+  .nav-link {
+    color: $color-text-primary;
+    
+    &:hover {
+      background-color: $color-gray-100;
+      color: $color-primary;
+    }
+    
+    &.router-link-active {
+      color: $color-primary;
+      background-color: rgba($color-primary, 0.1);
+    }
+  }
+}
+
+.nav-hero {
+  .nav-link {
+    color: $color-white;
+    
+    &:hover {
+      background-color: rgba($color-white, 0.1);
+    }
+    
+    &.router-link-active {
+      background-color: rgba($color-white, 0.2);
+    }
+  }
+}
+
+.nav-minimal {
+  .nav-link {
+    color: $color-text-muted;
+    font-size: $font-size-sm;
+    padding: $spacing-1 $spacing-2;
+    
+    &:hover {
+      color: $color-primary;
+    }
+    
+    &.router-link-active {
+      color: $color-primary;
+      font-weight: $font-weight-semibold;
+    }
+  }
+}
+
+// Sidebar Navigation
+.sidebar-navigation {
+  padding: 0;
+  
+  .nav-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .nav-item {
+    display: flex;
+    align-items: center;
+    padding: $spacing-3;
+    color: $color-text-muted;
+    text-decoration: none;
+    border-radius: $border-radius-md;
+    margin-bottom: $spacing-1;
+    transition: all $transition-base;
+    
+    &:hover {
+      background: rgba($color-primary, 0.1);
+      color: $color-primary;
+    }
+    
+    &.router-link-active {
+      background: $color-primary;
+      color: $color-white;
+    }
+  }
+  
+  .nav-icon {
+    margin-right: $spacing-3;
+    font-size: $font-size-lg;
+    width: 20px;
+    text-align: center;
+  }
+  
+  .nav-text {
+    font-weight: $font-weight-medium;
+    font-size: $font-size-sm;
+  }
+}
+
+// Mobile Navigation Toggle
+.nav-toggle {
+  display: none;
+  background: none;
+  border: none;
+  padding: $spacing-2;
+  cursor: pointer;
+  color: inherit;
+  
+  @include respond-down(md) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+// Mobile Navigation Menu
+@include respond-down(md) {
+  .layout-navigation {
+    position: fixed;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: $color-background;
+    border-top: 1px solid $color-border;
+    box-shadow: $shadow-lg;
+    flex-direction: column;
+    padding: $spacing-4;
+    transform: translateY(-100%);
+    opacity: 0;
+    visibility: hidden;
+    transition: all $transition-base;
+    z-index: $z-index-dropdown;
+    
+    &.nav-open {
+      transform: translateY(0);
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+  
+  .nav-hero .layout-navigation {
+    background: rgba($color-secondary, 0.95);
+    backdrop-filter: blur(10px);
+  }
+}

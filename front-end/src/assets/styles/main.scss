@@ -1,0 +1,15 @@
+// ==========================================================================
+// MAIN SCSS - HYBRID TAILWINDCSS + SASS ARCHITECTURE
+// ==========================================================================
+
+// ALL @use STATEMENTS MUST COME FIRST
+@use 'abstracts' as *;
+@use 'base';
+@use 'animations/keyframes';
+@use 'themes/dark-mode';
+@use 'layout';
+@use 'components';
+@use 'pages';
+
+// THEN @import STATEMENTS (Using @use for TailwindCSS v4+)
+// @use "tailwindcss";

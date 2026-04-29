@@ -1,0 +1,126 @@
+// ==========================================================================
+// DASHBOARD PAGE STYLES
+// ==========================================================================
+
+@use '../abstracts' as *;
+
+.dashboard {
+  padding: 0;
+  
+  .dashboard-header {
+    margin-bottom: $spacing-8;
+    
+    h1 {
+      margin: 0 0 $spacing-2 0;
+      color: $color-text-primary;
+      font-size: $font-size-2xl;
+      
+      @include respond-to(md) {
+        font-size: $font-size-3xl;
+      }
+      
+      @include respond-to(lg) {
+        font-size: $font-size-4xl;
+      }
+    }
+    
+    p {
+      margin: 0;
+      color: $color-text-secondary;
+      font-size: $font-size-base;
+      
+      @include respond-to(md) {
+        font-size: $font-size-lg;
+      }
+    }
+  }
+  
+  .dashboard-grid {
+    // ✅ Use TailwindCSS classes directly: grid grid-cols-1 md:grid-cols-2 lg:grid-cols-auto-fit gap-6
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: $spacing-6;
+    
+    @media (min-width: 768px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    @include respond-to(lg) {
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
+  }
+  
+  .dashboard-card {
+    // ✅ Use TailwindCSS classes directly: bg-white border border-gray-200 rounded-md p-6 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all
+    background: $color-white;
+    border: 1px solid $color-gray-200;
+    border-radius: $border-radius-md;
+    padding: $spacing-6;
+    box-shadow: $shadow-sm;
+    transition: all $transition-base;
+    
+    &:hover {
+      box-shadow: $shadow-md;
+      transform: translateY(-2px);
+    }
+    
+    h3 {
+      margin: 0 0 $spacing-2 0;
+      color: $color-text-primary;
+      font-size: $font-size-lg;
+      
+      @include respond-to(md) {
+        font-size: $font-size-xl;
+      }
+    }
+    
+    p {
+      margin: 0 0 $spacing-4 0;
+      color: $color-text-secondary;
+      line-height: $line-height-relaxed;
+    }
+  }
+  
+  .metric {
+    // ✅ Use TailwindCSS classes directly: flex flex-col items-center
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: $spacing-4;
+    background: $color-background-secondary;
+    border-radius: $border-radius-md;
+    
+    .metric-value {
+      font-size: $font-size-3xl;
+      font-weight: $font-weight-bold;
+      color: $color-primary;
+      
+      @include respond-to(md) {
+        font-size: $font-size-4xl;
+      }
+    }
+    
+    .metric-label {
+      font-size: $font-size-sm;
+      color: $color-text-muted;
+      margin-top: $spacing-1;
+    }
+  }
+  
+  .activity-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    
+    li {
+      padding: $spacing-2 0;
+      border-bottom: 1px solid $color-border-light;
+      color: $color-text-muted;
+      font-size: $font-size-sm;
+      
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+  }
+}
