@@ -60,7 +60,7 @@ importers:
         specifier: ^10.6.2
         version: 10.6.2
       jsonwebtoken:
-        specifier: ^9.0.2
+        specifier: ^9.0.3
         version: 9.0.3
       mongoose:
         specifier: ^9.5.0
