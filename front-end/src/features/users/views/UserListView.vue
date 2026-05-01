@@ -2,7 +2,7 @@
 import type { UserRole } from '@/types'
 import { onMounted, ref } from 'vue'
 import AuthNotice from '@/components/auth/AuthNotice.vue'
-import { useAuthStore } from '@/stores/auth'
+import { useAuthStore } from '@/features/auth'
 
 const authStore = useAuthStore()
 const message = ref('')

@@ -2,7 +2,7 @@
 import { onMounted, reactive, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import AuthNotice from '@/components/auth/AuthNotice.vue'
-import { useAuthStore } from '@/stores/auth'
+import { useAuthStore } from '@/features/auth'
 
 const authStore = useAuthStore()
 const router = useRouter()

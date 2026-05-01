@@ -2,7 +2,7 @@
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import AuthNotice from '@/components/auth/AuthNotice.vue'
-import { useAuthStore } from '@/stores/auth'
+import { useAuthStore } from '@/features/auth'
 
 const route = useRoute()
 const authStore = useAuthStore()

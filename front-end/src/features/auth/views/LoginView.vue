@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import AuthNotice from '@/components/auth/AuthNotice.vue'
-import { useAuthStore } from '@/stores/auth'
+import { useAuthStore } from '@/features/auth'
 
 const authStore = useAuthStore()
 const route = useRoute()
