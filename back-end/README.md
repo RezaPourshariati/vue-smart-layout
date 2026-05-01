@@ -13,6 +13,12 @@ Run commands:
 - `pnpm --dir back-end build`
 - `pnpm --dir back-end start`
 
+API base:
+
+- Canonical API namespace is `/api/auth` (non-versioned).
+- Feature routes are organized under `src/features/*` and mounted via `src/app.ts`.
+- Cross-cutting infrastructure lives under `src/common/*` (`middleware`, `errors`, `utils`).
+
 Next step (later migration batch):
 
 - Move or recreate your local `.env` from the previous server location into `back-end/.env`.

@@ -2,8 +2,9 @@ import bodyParser from 'body-parser'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import express from 'express'
-import errorHandler from './middleware/error.middleware.js'
-import authRoutes from './routes/auth.routes.js'
+import errorHandler from './common/errors/error.middleware.js'
+import { authRoutes } from './features/auth/index.js'
+import { userRoutes } from './features/users/index.js'
 
 const app = express()
 const allowedOrigins = [
@@ -24,8 +25,8 @@ app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok' })
 })
 
-app.use('/api/v1/users', authRoutes)
 app.use('/api/auth', authRoutes)
+app.use('/api/auth', userRoutes)
 app.use(errorHandler)
 
 export default app

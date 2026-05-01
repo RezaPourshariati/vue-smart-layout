@@ -1,10 +1,10 @@
 import type { NextFunction, Response } from 'express'
-import type { AuthJwtPayload, AuthRequest, RefreshTokenPayload } from '../types/auth.js'
+import type { AuthJwtPayload, AuthRequest, RefreshTokenPayload } from '../../types/auth.js'
 import asyncHandler from 'express-async-handler'
 import jwt from 'jsonwebtoken'
-import Token from '../models/token.model.js'
-import User from '../models/user.model.js'
-import { generateToken } from '../services/token.service.js'
+import Token from '../../models/token.model.js'
+import User from '../../models/user.model.js'
+import { generateToken } from '../../services/token.service.js'
 
 export const protect = asyncHandler(async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {

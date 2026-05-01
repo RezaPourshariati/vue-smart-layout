@@ -147,21 +147,21 @@ export const routerExamples = {
   // Using preset
   simpleRoute: {
     path: '/simple',
-    component: () => import('@/views/Home.vue'),
+    component: () => import('@/features/public/views/HomeView.vue'),
     meta: { layout: 'simple' },
   },
 
   // Using custom configuration
   customRoute: {
     path: '/custom',
-    component: () => import('@/views/About.vue'),
+    component: () => import('@/features/public/views/AboutView.vue'),
     meta: { layout: blogPostLayout },
   },
 
   // Inline configuration
   inlineRoute: {
     path: '/inline',
-    component: () => import('@/views/Contacts.vue'),
+    component: () => import('@/features/public/views/ContactsView.vue'),
     meta: {
       layout: {
         name: 'inline-custom',

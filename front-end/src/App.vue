@@ -1,12 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
 import AppLayout from '@/layouts/AppLayout.vue'
-import { useAuthStore } from '@/stores/auth'
-
-const authStore = useAuthStore()
-const isAppReady = ref(false)
-const router = useRouter()
 
 // onMounted(async () => {
 //   try {

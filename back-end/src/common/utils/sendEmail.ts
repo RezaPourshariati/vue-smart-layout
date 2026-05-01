@@ -30,10 +30,10 @@ async function sendEmail(
   const handlebarOptions = {
     viewEngine: {
       extName: '.handlebars',
-      partialsDir: path.resolve(__dirname, '../views'),
+      partialsDir: path.resolve(__dirname, '../../views'),
       defaultLayout: false as const,
     },
-    viewPath: path.resolve(__dirname, '../views'),
+    viewPath: path.resolve(__dirname, '../../views'),
     extName: '.handlebars',
   }
   transporter.use('compile', hbs(handlebarOptions))
