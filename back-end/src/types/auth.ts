@@ -1,5 +1,6 @@
 import type { Request } from 'express'
 import type { Document, Types } from 'mongoose'
+import type { TrustedDeviceSnapshot } from './device.js'
 
 export interface IUser extends Document {
   _id: Types.ObjectId
@@ -11,7 +12,7 @@ export interface IUser extends Document {
   bio: string
   role: 'subscriber' | 'author' | 'admin' | 'suspended'
   isVerified: boolean
-  userAgent: string[]
+  userAgent: TrustedDeviceSnapshot[]
   createdAt: Date
   updatedAt: Date
 }

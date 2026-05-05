@@ -18,6 +18,7 @@ function getCookie(name: string): string | null {
 }
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
+  console.log(path)
   const method = options?.method?.toUpperCase() || 'GET'
   const csrfToken = method !== 'GET' && method !== 'HEAD' ? getCookie('csrfToken') : null
 

@@ -6,7 +6,11 @@ import Cryptr from 'cryptr'
 import asyncHandler from 'express-async-handler'
 import { OAuth2Client } from 'google-auth-library'
 import jwt from 'jsonwebtoken'
-import { UAParser } from 'ua-parser-js'
+import {
+  mergeTrustedDevice,
+  trustedDeviceFromRequest,
+  userHasTrustedDevice,
+} from '../../common/device/trustedDevice.js'
 import sendEmail from '../../common/utils/sendEmail.js'
 import Token from '../../models/token.model.js'
 import User from '../../models/user.model.js'
@@ -49,9 +53,8 @@ export const registerUser = asyncHandler(async (req: AuthRequest, res: Response)
   if (userExists)
     throw new Error('This email already in use')
 
-  const ua = new UAParser(req.headers['user-agent']).getResult()
-  const userAgent = [ua.ua || 'unknown']
-  const user = await User.create({ name, email, password, userAgent })
+  const device = trustedDeviceFromRequest(req)
+  const user = await User.create({ name, email, password, userAgent: [device] })
 
   const token = generateToken(user._id)
   setAuthCookies(res, token)
@@ -71,10 +74,9 @@ export const loginUser = asyncHandler(async (req: AuthRequest, res: Response): P
   if (!passwordIsCorrect)
     throw new Error('Invalid email or password')
 
-  const ua = new UAParser(req.headers['user-agent']).getResult()
-  const thisUserAgent = ua.ua || 'unknown'
-  const allowedAgent = user.userAgent.includes(thisUserAgent)
-  if (!allowedAgent) {
+  const currentDevice = trustedDeviceFromRequest(req)
+  const allowedDevice = userHasTrustedDevice(user.userAgent, currentDevice)
+  if (!allowedDevice) {
     const cryptr = getCryptr()
     const loginCode = Math.floor(100000 + Math.random() * 900000)
     const encryptedLoginCode = cryptr.encrypt(loginCode.toString())
@@ -142,7 +144,9 @@ export const sendVerificationEmail = asyncHandler(async (req: AuthRequest, res: 
   if (token)
     await token.deleteOne()
   const verificationToken = crypto.randomBytes(32).toString('hex') + user._id
+  console.log(verificationToken)
   const hashedToken = hashToken(verificationToken)
+  console.log('--->', hashedToken)
   await new Token({
     userId: user._id,
     verificationToken: hashedToken,
@@ -244,6 +248,10 @@ export const sendLoginCode = asyncHandler(async (req: AuthRequest, res: Response
   if (!userToken)
     throw new Error('Invalid or Expired Token, please login again')
   const decryptedLoginCode = getCryptr().decrypt(userToken.loginToken)
+
+  if (process.env.NODE_ENV === 'development')
+    console.log(`[smart-auth-dashboard] Login code for ${email}: ${decryptedLoginCode}`)
+
   await sendEmail(
     'Login Access Code - Smart Layout',
     email,
@@ -268,8 +276,7 @@ export const loginWithCode = asyncHandler(async (req: AuthRequest, res: Response
   const decryptedLoginCode = getCryptr().decrypt(userToken.loginToken)
   if (loginCode !== decryptedLoginCode)
     throw new Error('Incorrect login code, please try again')
-  const thisUserAgent = new UAParser(req.headers['user-agent']).getResult().ua || 'unknown'
-  user.userAgent.push(thisUserAgent)
+  user.set('userAgent', mergeTrustedDevice(user.userAgent, trustedDeviceFromRequest(req)))
   await user.save()
   const token = generateToken(user._id)
   setAuthCookies(res, token)
@@ -286,10 +293,10 @@ export const loginWithGoogle = asyncHandler(async (req: AuthRequest, res: Respon
   const payload = ticket.getPayload() as GooglePayload
   const { name, email, picture, sub } = payload
   const password = Date.now() + sub
-  const userAgent = [new UAParser(req.headers['user-agent']).getResult().ua || 'unknown']
+  const initialDevice = trustedDeviceFromRequest(req)
   let user = await User.findOne({ email })
   if (!user)
-    user = await User.create({ name, email, password, photo: picture, isVerified: true, userAgent })
+    user = await User.create({ name, email, password, photo: picture, isVerified: true, userAgent: [initialDevice] })
   const accessToken = generateToken(user._id)
   setAuthCookies(res, accessToken)
   res.status(201).json(user)

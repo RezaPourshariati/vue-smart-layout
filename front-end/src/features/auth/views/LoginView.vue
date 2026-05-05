@@ -27,8 +27,14 @@ async function handleLogin() {
     const message = error instanceof Error ? error.message : 'Login failed'
     errorMessage.value = message
     if (message.includes('New browser or device detected')) {
-      await authStore.sendLoginCode(email.value)
-      await router.push({ name: 'LoginWithCode', query: { email: email.value } })
+      try {
+        await authStore.sendLoginCode(email.value)
+        await router.push({ name: 'LoginWithCode', query: { email: email.value } })
+      }
+      catch (sendError) {
+        const sendMsg = sendError instanceof Error ? sendError.message : 'Could not send login code'
+        errorMessage.value = `${message} We could not email your code: ${sendMsg}`
+      }
     }
   }
 }

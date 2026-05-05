@@ -2,6 +2,14 @@ import type { IUser } from '../types/auth.js'
 import bcrypt from 'bcryptjs'
 import mongoose, { Schema } from 'mongoose'
 
+const trustedDeviceSchema = new Schema(
+  {
+    browser: { type: String, required: true, trim: true },
+    os: { type: String, required: true, trim: true },
+  },
+  { _id: false },
+)
+
 const userSchema = new Schema<IUser>(
   {
     name: {
@@ -45,8 +53,9 @@ const userSchema = new Schema<IUser>(
       required: true,
       default: false,
     },
+    // Trusted environments: `{ browser, os }` (see trustedDevice).
     userAgent: {
-      type: [String],
+      type: [trustedDeviceSchema],
       required: true,
       default: [],
     },
