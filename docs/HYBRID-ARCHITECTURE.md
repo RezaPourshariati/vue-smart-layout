@@ -244,17 +244,12 @@ TailwindCSS v4 **no longer supports preprocessors directly**. You can still use 
 - **TailwindCSS utilities in templates**: `class="p-4 md:flex lg:grid-cols-3"`
 - **Tailwind directives in plain CSS files only**, e.g., `src/assets/main.css`:
 
-  ```css
-  @import 'tailwindcss';
-  /* Optional: @layer blocks in CSS only */
-  ```
-
-```
-
+```css
+@import 'tailwindcss';
+/* Optional: @layer blocks in CSS only */
 ```
 
 ````
-
 - **Sass for non-Tailwind concerns**: Complex animations, mixins, math, theming, component-scoped effects
 - **Native CSS features inside SCSS**: Media queries, container queries — but **NOT** Tailwind's `@screen`, `@apply`, or `@tailwind`
 - **CSS custom properties for tokens**: Reference them from Tailwind via `colors: { brand: 'var(--brand-color)' }`
@@ -283,7 +278,6 @@ TailwindCSS v4 **no longer supports preprocessors directly**. You can still use 
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   }
 }
-
 ````
 
 #### **Custom Grids**
