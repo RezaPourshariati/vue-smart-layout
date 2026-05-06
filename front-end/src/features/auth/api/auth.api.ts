@@ -8,6 +8,16 @@ import type {
 } from '@/types'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000/api/auth'
+const SKIP_REFRESH_RETRY_PATHS = new Set([
+  '/login',
+  '/register',
+  '/refresh',
+  '/sendLoginCode',
+  '/loginWithCode',
+  '/forgotPassword',
+  '/resetPassword',
+  '/google/callback',
+])
 
 function getCookie(name: string): string | null {
   const pattern = new RegExp(`(?:^|; )${name}=([^;]*)`)
@@ -17,8 +27,7 @@ function getCookie(name: string): string | null {
   return decodeURIComponent(match[1] || '')
 }
 
-async function request<T>(path: string, options?: RequestInit): Promise<T> {
-  console.log(path)
+async function request<T>(path: string, options?: RequestInit, canRetryWithRefresh = true): Promise<T> {
   const method = options?.method?.toUpperCase() || 'GET'
   const csrfToken = method !== 'GET' && method !== 'HEAD' ? getCookie('csrfToken') : null
 
@@ -33,8 +42,22 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
   })
 
   const data = await response.json().catch(() => ({}))
-  if (!response.ok)
+  if (!response.ok) {
+    const canTryRefresh
+      = canRetryWithRefresh
+        && response.status === 401
+        && !SKIP_REFRESH_RETRY_PATHS.has(path)
+    if (canTryRefresh) {
+      try {
+        await refreshSession()
+        return await request<T>(path, options, false)
+      }
+      catch {
+        // If refresh also fails, surface the original API error below.
+      }
+    }
     throw new Error(data.message || 'Authentication request failed')
+  }
 
   return data as T
 }
@@ -63,6 +86,10 @@ export async function getLoginStatus(): Promise<boolean> {
 
 export async function getCurrentUser(): Promise<AuthUser> {
   return await request<AuthUser>('/me')
+}
+
+export async function refreshSession(): Promise<{ message: string }> {
+  return await request<{ message: string }>('/refresh', { method: 'POST' }, false)
 }
 
 export async function sendLoginCode(email: string): Promise<{ message: string }> {

@@ -9,6 +9,7 @@ import {
   loginWithCode,
   loginWithGoogle,
   logoutUser,
+  refreshSession,
   registerUser,
   resetPassword,
   sendLoginCode,
@@ -21,6 +22,7 @@ const authRateLimiter = createRateLimiter(10, 60 * 1000)
 
 router.post('/register', registerUser)
 router.post('/login', authRateLimiter, loginUser)
+router.post('/refresh', refreshSession)
 router.post('/logout', logoutUser)
 router.get('/status', loginStatus)
 router.post('/sendVerificationEmail', protect, sendVerificationEmail)

@@ -113,9 +113,59 @@ export const loginUser = asyncHandler(async (req: AuthRequest, res: Response): P
 })
 
 export const logoutUser = asyncHandler(async (_req: AuthRequest, res: Response): Promise<void> => {
+  const refreshSecret = process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET
+  const refreshTokenCookie = _req.cookies?.refreshToken as string | undefined
+
+  if (refreshTokenCookie && refreshSecret) {
+    try {
+      const verified = jwt.verify(refreshTokenCookie, refreshSecret) as { refreshToken: string, userId: string }
+      await Token.findOneAndDelete({
+        userId: verified.userId,
+        refreshToken: verified.refreshToken,
+      })
+    }
+    catch {
+      // Best-effort cleanup: always clear cookies even if token is invalid/expired.
+    }
+  }
+
   res.cookie('accessToken', '', { path: '/', httpOnly: true, expires: new Date(0), sameSite: 'none', secure: true })
   res.cookie('refreshToken', '', { path: '/', httpOnly: true, expires: new Date(0), sameSite: 'none', secure: true })
   res.status(200).json({ message: 'Logout successful' })
+})
+
+export const refreshSession = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
+  const refreshTokenCookie = req.cookies?.refreshToken as string | undefined
+  const refreshSecret = process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET
+  if (!refreshTokenCookie || !refreshSecret)
+    throw new Error('Not authorized, please login')
+
+  const verified = jwt.verify(refreshTokenCookie, refreshSecret) as { refreshToken: string, userId: string }
+  const userToken = await Token.findOne({
+    userId: verified.userId,
+    refreshToken: verified.refreshToken,
+    expiresAt: { $gt: Date.now() },
+  })
+  if (!userToken)
+    throw new Error('Not authorized, please login')
+
+  const user = await User.findById(verified.userId)
+  if (!user)
+    throw new Error('User not found')
+  if (user.role === 'suspended')
+    throw new Error('User suspended, please contact support')
+
+  const newRefreshTokenRaw = crypto.randomBytes(32).toString('hex') + user._id
+  const nextRefreshToken = generateRefreshToken({ refreshToken: newRefreshTokenRaw, userId: user._id })
+  const accessToken = generateToken(user._id)
+
+  userToken.refreshToken = newRefreshTokenRaw
+  userToken.createdAt = new Date()
+  userToken.expiresAt = new Date(Date.now() + 1000 * 86400 * 2)
+  await userToken.save()
+
+  setAuthCookies(res, accessToken, nextRefreshToken)
+  res.status(200).json({ message: 'Session refreshed' })
 })
 
 export const loginStatus = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {

@@ -42,6 +42,17 @@ export const useAuthStore = defineStore('auth', {
 
       this.isLoading = true
       try {
+        // Proactively refresh first to restore session when only refresh cookie is still valid.
+        try {
+          await authService.refreshSession()
+          const refreshedUser = await authService.getCurrentUser()
+          this.setUser(refreshedUser)
+          return
+        }
+        catch {
+          // Fall through to status/access-token checks.
+        }
+
         const isLoggedIn = await authService.getLoginStatus()
         if (isLoggedIn) {
           const user = await authService.getCurrentUser()

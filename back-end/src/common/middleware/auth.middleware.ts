@@ -1,10 +1,11 @@
 import type { NextFunction, Response } from 'express'
 import type { AuthJwtPayload, AuthRequest, RefreshTokenPayload } from '../../types/auth.js'
+import crypto from 'node:crypto'
 import asyncHandler from 'express-async-handler'
 import jwt from 'jsonwebtoken'
 import Token from '../../models/token.model.js'
 import User from '../../models/user.model.js'
-import { generateToken } from '../../services/token.service.js'
+import { generateRefreshToken, generateToken } from '../../services/token.service.js'
 
 export const protect = asyncHandler(async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -28,10 +29,26 @@ export const protect = asyncHandler(async (req: AuthRequest, res: Response, next
 
     if (refreshToken) {
       const verified = jwt.verify(refreshToken, refreshSecret) as RefreshTokenPayload
-      const userToken = await Token.findOne({ userId: verified.userId, refreshToken: verified.refreshToken })
+      const userToken = await Token.findOne({
+        userId: verified.userId,
+        refreshToken: verified.refreshToken,
+        expiresAt: { $gt: Date.now() },
+      })
       if (!userToken)
         throw new Error('Not authorized, please login')
+
+      const newRefreshTokenRaw = crypto.randomBytes(32).toString('hex') + userToken.userId
+      const rotatedRefreshToken = generateRefreshToken({
+        refreshToken: newRefreshTokenRaw,
+        userId: userToken.userId,
+      })
       const newAccessToken = generateToken(userToken.userId)
+
+      userToken.refreshToken = newRefreshTokenRaw
+      userToken.createdAt = new Date()
+      userToken.expiresAt = new Date(Date.now() + 1000 * 86400 * 2)
+      await userToken.save()
+
       res.cookie('accessToken', newAccessToken, {
         path: '/',
         httpOnly: true,
@@ -39,9 +56,18 @@ export const protect = asyncHandler(async (req: AuthRequest, res: Response, next
         sameSite: 'none',
         secure: true,
       })
+      res.cookie('refreshToken', rotatedRefreshToken, {
+        path: '/',
+        httpOnly: true,
+        expires: new Date(Date.now() + 1000 * 86400 * 2),
+        sameSite: 'none',
+        secure: true,
+      })
       const user = await User.findById(verified.userId).select('-password')
       if (!user)
         throw new Error('User not found!')
+      if (user.role === 'suspended')
+        throw new Error('User suspended, please contact support')
       req.user = user
       next()
       return
