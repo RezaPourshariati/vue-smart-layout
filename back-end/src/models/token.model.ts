@@ -31,6 +31,16 @@ const tokenSchema = new Schema<IToken>({
     type: Date,
     required: true,
   },
+  sessionStartedAt: {
+    type: Date,
+    required: true,
+    default: () => new Date(),
+  },
+  lastUsedAt: {
+    type: Date,
+    required: true,
+    default: () => new Date(),
+  },
 })
 
 const Token = mongoose.model<IToken>('Token', tokenSchema)

@@ -29,8 +29,12 @@ router.beforeEach(async (to) => {
   if (to.meta.guestOnly && authStore.isAuthenticated)
     return { name: 'Home' }
 
-  if (to.meta.requiresAuth && !authStore.isAuthenticated)
-    return { name: 'Login', query: { redirect: to.fullPath } }
+  if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+    const query: Record<string, string> = { redirect: to.fullPath }
+    if (authStore.sessionExpiryCode)
+      query.session = authStore.sessionExpiryCode
+    return { name: 'Login', query }
+  }
 
   if (to.meta.roles?.length) {
     const hasAnyRole = to.meta.roles.some(role => authStore.hasRole(role))

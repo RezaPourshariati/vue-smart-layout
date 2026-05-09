@@ -5,6 +5,13 @@ import 'dotenv/config'
 
 const port = Number(process.env.PORT || 4000)
 
+function readPositiveMs(value: string | undefined, fallback: number): number {
+  const parsed = Number(value)
+  if (!Number.isFinite(parsed) || parsed <= 0)
+    return fallback
+  return parsed
+}
+
 async function start() {
   try {
     const mongoUri = process.env.MONGO_URI
@@ -13,6 +20,15 @@ async function start() {
       throw new Error('MONGO_URI is not defined')
     await mongoose.connect(mongoUri)
     console.log('Database Connected Successfully.')
+
+    const configuredIdleMs = readPositiveMs(process.env.SESSION_IDLE_TIMEOUT_MS, 1000 * 60 * 30) // 30m
+    const configuredTouchMs = readPositiveMs(process.env.SESSION_LAST_USED_TOUCH_INTERVAL_MS, 1000 * 30) // 30s
+    if (configuredTouchMs > configuredIdleMs) {
+      console.warn(
+        '[smart-layout] SESSION_LAST_USED_TOUCH_INTERVAL_MS is greater than SESSION_IDLE_TIMEOUT_MS. '
+        + 'Touch interval will be clamped to idle timeout.',
+      )
+    }
 
     if (process.env.NODE_ENV === 'development') {
       verifyEmailTransport().then((result) => {

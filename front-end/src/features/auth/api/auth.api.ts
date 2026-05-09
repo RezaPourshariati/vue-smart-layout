@@ -19,6 +19,12 @@ const SKIP_REFRESH_RETRY_PATHS = new Set([
   '/google/callback',
 ])
 
+export type AuthApiErrorCode = 'SESSION_IDLE_EXPIRED' | 'SESSION_ABSOLUTE_EXPIRED'
+
+export class AuthApiError extends Error {
+  code?: AuthApiErrorCode
+}
+
 function getCookie(name: string): string | null {
   const pattern = new RegExp(`(?:^|; )${name}=([^;]*)`)
   const match = document.cookie.match(pattern)
@@ -56,7 +62,9 @@ async function request<T>(path: string, options?: RequestInit, canRetryWithRefre
         // If refresh also fails, surface the original API error below.
       }
     }
-    throw new Error(data.message || 'Authentication request failed')
+    const error = new AuthApiError(data.message || 'Authentication request failed')
+    error.code = typeof data.code === 'string' ? data.code : undefined
+    throw error
   }
 
   return data as T

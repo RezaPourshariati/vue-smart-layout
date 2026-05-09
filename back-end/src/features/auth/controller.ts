@@ -14,6 +14,7 @@ import {
 import sendEmail from '../../common/utils/sendEmail.js'
 import Token from '../../models/token.model.js'
 import User from '../../models/user.model.js'
+import { buildSessionTimestamps, getRefreshLifetimeMs, getSessionExpiryCode } from '../../services/session-policy.service.js'
 import { generateRefreshToken, generateToken, hashToken } from '../../services/token.service.js'
 
 function getCryptr(): Cryptr {
@@ -32,12 +33,13 @@ function setAuthCookies(res: Response, accessToken: string, refreshToken?: strin
     maxAge: 1000 * 60 * 60 * 4,
   })
   if (refreshToken) {
+    const refreshLifetimeMs = getRefreshLifetimeMs()
     res.cookie('refreshToken', refreshToken, {
       path: '/',
       httpOnly: true,
       sameSite: 'none',
       secure: true,
-      expires: new Date(Date.now() + 1000 * 86400 * 2),
+      expires: new Date(Date.now() + refreshLifetimeMs),
     })
   }
 }
@@ -102,11 +104,14 @@ export const loginUser = asyncHandler(async (req: AuthRequest, res: Response): P
   const userToken = await Token.findOne({ userId: user._id })
   if (userToken)
     await userToken.deleteOne()
+  const sessionTimestamps = buildSessionTimestamps()
   await new Token({
     userId: user._id,
     refreshToken: newRefreshToken,
-    createdAt: Date.now(),
-    expiresAt: Date.now() + 1000 * 86400 * 2,
+    createdAt: sessionTimestamps.createdAt,
+    expiresAt: sessionTimestamps.expiresAt,
+    lastUsedAt: sessionTimestamps.lastUsedAt,
+    sessionStartedAt: sessionTimestamps.sessionStartedAt,
   }).save()
 
   res.status(200).json(user)
@@ -148,6 +153,15 @@ export const refreshSession = asyncHandler(async (req: AuthRequest, res: Respons
   })
   if (!userToken)
     throw new Error('Not authorized, please login')
+  const sessionExpiryCode = getSessionExpiryCode(userToken)
+  if (sessionExpiryCode) {
+    await userToken.deleteOne()
+    res.status(401).json({
+      code: sessionExpiryCode,
+      message: 'Session expired, please login again',
+    })
+    return
+  }
 
   const user = await User.findById(verified.userId)
   if (!user)
@@ -160,8 +174,11 @@ export const refreshSession = asyncHandler(async (req: AuthRequest, res: Respons
   const accessToken = generateToken(user._id)
 
   userToken.refreshToken = newRefreshTokenRaw
-  userToken.createdAt = new Date()
-  userToken.expiresAt = new Date(Date.now() + 1000 * 86400 * 2)
+  const nextSession = buildSessionTimestamps(userToken.sessionStartedAt)
+  userToken.createdAt = nextSession.createdAt
+  userToken.lastUsedAt = nextSession.lastUsedAt
+  userToken.expiresAt = nextSession.expiresAt
+  userToken.sessionStartedAt = nextSession.sessionStartedAt
   await userToken.save()
 
   setAuthCookies(res, accessToken, nextRefreshToken)
@@ -179,8 +196,32 @@ export const loginStatus = asyncHandler(async (req: AuthRequest, res: Response):
     res.json(false)
     return
   }
-  const verified = jwt.verify(accessToken, secret)
-  res.json(Boolean(verified))
+  const verified = jwt.verify(accessToken, secret) as { id?: string }
+  if (!verified?.id) {
+    res.json(false)
+    return
+  }
+
+  const activeSession = await Token.findOne({
+    userId: verified.id,
+    refreshToken: { $ne: '' },
+  })
+  if (!activeSession) {
+    res.json(false)
+    return
+  }
+
+  const sessionExpiryCode = getSessionExpiryCode(activeSession)
+  if (sessionExpiryCode) {
+    await activeSession.deleteOne()
+    res.status(401).json({
+      code: sessionExpiryCode,
+      message: 'Session expired, please login again',
+    })
+    return
+  }
+
+  res.json(true)
 })
 
 export const sendVerificationEmail = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {

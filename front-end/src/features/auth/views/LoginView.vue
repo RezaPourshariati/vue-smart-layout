@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import AuthNotice from '@/components/auth/AuthNotice.vue'
 import { useAuthStore } from '@/features/auth'
@@ -14,7 +14,28 @@ const errorMessage = ref('')
 
 const redirectTo = computed(() => {
   const redirect = route.query.redirect
-  return typeof redirect === 'string' ? redirect : '/'
+  if (typeof redirect !== 'string')
+    return '/'
+  // Prevent open-redirect behavior: only allow in-app absolute paths.
+  return redirect.startsWith('/') && !redirect.startsWith('//') ? redirect : '/'
+})
+
+const sessionMessage = computed(() => {
+  const session = route.query.session
+  if (session === 'SESSION_IDLE_EXPIRED')
+    return 'You were inactive for too long. Please log in again.'
+  if (session === 'SESSION_ABSOLUTE_EXPIRED')
+    return 'Your maximum session time has ended. Please log in again.'
+  return authStore.sessionExpiryMessage
+})
+
+onMounted(async () => {
+  if (!route.query.session)
+    return
+
+  const nextQuery = { ...route.query }
+  delete nextQuery.session
+  await router.replace({ query: nextQuery })
 })
 
 async function handleLogin() {
@@ -78,10 +99,10 @@ async function handleLogin() {
     </form>
 
     <AuthNotice
-      v-if="errorMessage"
+      v-if="errorMessage || sessionMessage"
       class="mt-4"
       kind="error"
-      :message="errorMessage"
+      :message="errorMessage || sessionMessage"
     />
     <p class="mt-4 text-sm">
       <RouterLink

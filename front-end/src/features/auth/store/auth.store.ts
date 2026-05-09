@@ -1,3 +1,4 @@
+import type { AuthApiError, AuthApiErrorCode } from '../api/auth.api'
 import type {
   AuthCredentials,
   AuthUser,
@@ -17,10 +18,18 @@ export const useAuthStore = defineStore('auth', {
     isLoading: false,
     authChecked: false,
     pendingLoginCodeEmail: '' as string,
+    sessionExpiryCode: null as AuthApiErrorCode | null,
   }),
   getters: {
     roles: state => (state.user?.role ? [state.user.role] : []),
     hasRole: state => (role: string) => state.user?.role === role,
+    sessionExpiryMessage(state): string {
+      if (state.sessionExpiryCode === 'SESSION_IDLE_EXPIRED')
+        return 'You were inactive for too long. Please log in again.'
+      if (state.sessionExpiryCode === 'SESSION_ABSOLUTE_EXPIRED')
+        return 'Your maximum session time has ended. Please log in again.'
+      return ''
+    },
     isAdmin(): boolean {
       return this.hasRole('admin')
     },
@@ -36,6 +45,12 @@ export const useAuthStore = defineStore('auth', {
       this.isAuthenticated = false
       this.pendingLoginCodeEmail = ''
     },
+    clearSessionExpiryCode() {
+      this.sessionExpiryCode = null
+    },
+    setSessionExpiryCode(code?: AuthApiErrorCode) {
+      this.sessionExpiryCode = code || null
+    },
     async bootstrapAuth() {
       if (this.authChecked)
         return
@@ -47,16 +62,24 @@ export const useAuthStore = defineStore('auth', {
           await authService.refreshSession()
           const refreshedUser = await authService.getCurrentUser()
           this.setUser(refreshedUser)
+          this.clearSessionExpiryCode()
           return
         }
-        catch {
-          // Fall through to status/access-token checks.
+        catch (error) {
+          const authError = error as AuthApiError
+          if (authError?.code) {
+            this.setSessionExpiryCode(authError.code)
+            this.clearAuth()
+            return
+          }
+          // Fall through to status/access-token checks (access token might still be valid).
         }
 
         const isLoggedIn = await authService.getLoginStatus()
         if (isLoggedIn) {
           const user = await authService.getCurrentUser()
           this.setUser(user)
+          this.clearSessionExpiryCode()
         }
         else {
           this.clearAuth()
@@ -75,6 +98,7 @@ export const useAuthStore = defineStore('auth', {
       try {
         const user = await authService.login(credentials)
         this.setUser(user)
+        this.clearSessionExpiryCode()
         this.pendingLoginCodeEmail = ''
       }
       catch (error) {
@@ -93,6 +117,7 @@ export const useAuthStore = defineStore('auth', {
       try {
         const user = await authService.register(payload)
         this.setUser(user)
+        this.clearSessionExpiryCode()
       }
       finally {
         this.isLoading = false
@@ -112,6 +137,7 @@ export const useAuthStore = defineStore('auth', {
       try {
         const user = await authService.loginWithCode(email, loginCode)
         this.setUser(user)
+        this.clearSessionExpiryCode()
         this.pendingLoginCodeEmail = ''
       }
       finally {

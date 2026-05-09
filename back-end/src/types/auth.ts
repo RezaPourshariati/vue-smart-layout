@@ -26,6 +26,8 @@ export interface IToken extends Document {
   loginToken: string
   createdAt: Date
   expiresAt: Date
+  sessionStartedAt: Date
+  lastUsedAt: Date
 }
 
 export interface AuthRequest extends Request {
