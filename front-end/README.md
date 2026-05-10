@@ -1,6 +1,6 @@
 # Front-End Package (Staged Migration)
 
-This package is the staged front-end boundary for Smart Layout.
+This package is the staged front-end boundary for AdaptiveAuth.
 
 Current status:
 

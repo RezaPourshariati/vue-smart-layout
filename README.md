@@ -1,6 +1,8 @@
-# vue-smart-layout
+# AdaptiveAuth
 
-Smart Layout is organized as a pnpm workspace with separate front-end and back-end packages.
+AdaptiveAuth is a full-stack adaptive authentication starter organized as a pnpm workspace with separate front-end and back-end packages.
+
+> This repository was previously named **`vue-smart-layout`**. Current package and product name: **AdaptiveAuth** (repo **`adaptive-auth`**).
 
 ## Project Structure
 

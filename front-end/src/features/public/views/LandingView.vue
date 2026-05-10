@@ -8,10 +8,10 @@
     <section class="landing-hero min-h-[80vh] flex items-center justify-center text-white px-16 py-16 relative overflow-hidden md:flex-row flex-col text-center md:text-left md:px-8 md:py-8">
       <div class="flex-1 max-w-[600px] z-10 relative">
         <h1 class="text-3xl md:text-4xl lg:text-6xl font-extrabold mb-4 leading-tight">
-          Vue Smart Layout
+          AdaptiveAuth
         </h1>
         <p class="text-base md:text-lg lg:text-xl mb-8 opacity-90 leading-relaxed">
-          Build scalable, flexible layouts with our composable layout system
+          Full-stack adaptive authentication: explicit refresh orchestration, session policy, and a Vue SPA you can extend
         </p>
         <div class="flex gap-4 flex-wrap md:justify-center">
           <button class="inline-flex items-center justify-center px-6 py-3 border-0 rounded-md font-medium text-white bg-emerald-600 hover:bg-emerald-700 transition-all">
@@ -40,7 +40,7 @@
     <section class="py-24 px-8 bg-gray-50 md:py-16 md:px-4">
       <div class="max-w-6xl mx-auto">
         <h2 class="text-center text-2xl md:text-3xl lg:text-4xl font-extrabold mb-12 md:mb-16 text-gray-900">
-          Why Choose Vue Smart Layout?
+          Why Choose AdaptiveAuth?
         </h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
           <div class="bg-white border border-gray-200 rounded-md p-8 shadow-sm text-center transition-transform hover:-translate-y-2 md:p-6">
