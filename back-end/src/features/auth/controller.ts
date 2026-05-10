@@ -142,17 +142,29 @@ export const logoutUser = asyncHandler(async (_req: AuthRequest, res: Response):
 export const refreshSession = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
   const refreshTokenCookie = req.cookies?.refreshToken as string | undefined
   const refreshSecret = process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET
-  if (!refreshTokenCookie || !refreshSecret)
-    throw new Error('Not authorized, please login')
+  if (!refreshTokenCookie || !refreshSecret) {
+    res.status(401).json({ message: 'Not authorized, please login' })
+    return
+  }
 
-  const verified = jwt.verify(refreshTokenCookie, refreshSecret) as { refreshToken: string, userId: string }
+  let verified: { refreshToken: string, userId: string }
+  try {
+    verified = jwt.verify(refreshTokenCookie, refreshSecret) as { refreshToken: string, userId: string }
+  }
+  catch {
+    res.status(401).json({ message: 'Not authorized, please login' })
+    return
+  }
+
   const userToken = await Token.findOne({
     userId: verified.userId,
     refreshToken: verified.refreshToken,
     expiresAt: { $gt: Date.now() },
   })
-  if (!userToken)
-    throw new Error('Not authorized, please login')
+  if (!userToken) {
+    res.status(401).json({ message: 'Not authorized, please login' })
+    return
+  }
   const sessionExpiryCode = getSessionExpiryCode(userToken)
   if (sessionExpiryCode) {
     await userToken.deleteOne()
@@ -164,10 +176,14 @@ export const refreshSession = asyncHandler(async (req: AuthRequest, res: Respons
   }
 
   const user = await User.findById(verified.userId)
-  if (!user)
-    throw new Error('User not found')
-  if (user.role === 'suspended')
-    throw new Error('User suspended, please contact support')
+  if (!user) {
+    res.status(401).json({ message: 'Not authorized, please login' })
+    return
+  }
+  if (user.role === 'suspended') {
+    res.status(403).json({ message: 'User suspended, please contact support' })
+    return
+  }
 
   const newRefreshTokenRaw = crypto.randomBytes(32).toString('hex') + user._id
   const nextRefreshToken = generateRefreshToken({ refreshToken: newRefreshTokenRaw, userId: user._id })
@@ -289,7 +305,7 @@ export const forgotPassword = asyncHandler(async (req: AuthRequest, res: Respons
     createdAt: Date.now(),
     expiresAt: Date.now() + 60 * 60 * 1000,
   }).save()
-  const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/resetPassword/${resetToken}`
+  const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password/${resetToken}`
   await sendEmail(
     'Password Reset Request - Smart Layout',
     user.email,

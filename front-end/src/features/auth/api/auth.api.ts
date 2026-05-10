@@ -25,6 +25,8 @@ export class AuthApiError extends Error {
   code?: AuthApiErrorCode
 }
 
+let refreshInFlight: Promise<{ message: string }> | null = null
+
 function getCookie(name: string): string | null {
   const pattern = new RegExp(`(?:^|; )${name}=([^;]*)`)
   const match = document.cookie.match(pattern)
@@ -97,7 +99,16 @@ export async function getCurrentUser(): Promise<AuthUser> {
 }
 
 export async function refreshSession(): Promise<{ message: string }> {
-  return await request<{ message: string }>('/refresh', { method: 'POST' }, false)
+  if (refreshInFlight)
+    return await refreshInFlight
+
+  refreshInFlight = request<{ message: string }>('/refresh', { method: 'POST' }, false)
+  try {
+    return await refreshInFlight
+  }
+  finally {
+    refreshInFlight = null
+  }
 }
 
 export async function sendLoginCode(email: string): Promise<{ message: string }> {
