@@ -13,10 +13,10 @@ function goTo(path: string) {
 <template>
   <section class="mx-auto max-w-lg py-10">
     <h1 class="mb-2 text-3xl font-bold">
-      Smart Layout Authentication
+      AdaptiveAuth
     </h1>
     <p class="mb-6 text-gray-600">
-      Advanced auth flow inspired by the reference app, adapted to Vue + Pinia and your layout architecture.
+      Adaptive session and token flow for Vue + Pinia, with explicit refresh orchestration and server-side session policy.
     </p>
 
     <div class="grid gap-4 md:grid-cols-2">

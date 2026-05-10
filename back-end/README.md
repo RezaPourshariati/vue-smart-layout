@@ -1,6 +1,6 @@
 # Back-End Package
 
-This package is the canonical back-end root for Smart Layout.
+This package is the canonical back-end root for AdaptiveAuth.
 
 Current status:
 

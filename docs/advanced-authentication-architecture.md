@@ -1,6 +1,6 @@
 # Advanced Authentication Reference Architecture
 
-This document summarizes the authentication approach used in `dev-apps/advanced-authentication` so it can be used as a reference when evolving the Smart Layout project.
+This document summarizes the authentication approach used in `dev-apps/advanced-authentication` so it can be used as a reference when evolving the AdaptiveAuth project.
 
 ## Project Scope
 
@@ -167,9 +167,9 @@ Overall, this design is **Intermediate to Advanced** for a demo/reference app.
 
 ---
 
-## How to Reuse This in Smart Layout
+## How to Reuse This in AdaptiveAuth
 
-When adapting ideas into Smart Layout, prioritize this order:
+When adapting ideas into AdaptiveAuth, prioritize this order:
 
 1. **Core auth baseline**: access token + refresh flow + `protect` middleware.
 2. **RBAC**: role middleware and protected feature flags in UI.

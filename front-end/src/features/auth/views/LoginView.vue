@@ -8,7 +8,7 @@ const authStore = useAuthStore()
 const route = useRoute()
 const router = useRouter()
 
-const email = ref('admin@smartlayout.dev')
+const email = ref('admin@adaptive-auth.dev')
 const password = ref('password123')
 const errorMessage = ref('')
 
@@ -67,10 +67,10 @@ async function handleLogin() {
       Login
     </h1>
     <p class="mb-6 text-slate-600">
-      Sign in to access protected Smart Layout routes.
+      Sign in to access protected AdaptiveAuth routes.
     </p>
     <p class="mb-6 text-xs text-slate-500">
-      Test accounts: `admin@smartlayout.dev` / `password123`
+      Test accounts: `admin@adaptive-auth.dev` / `password123`
     </p>
 
     <form

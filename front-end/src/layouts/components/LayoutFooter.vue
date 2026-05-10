@@ -28,7 +28,7 @@ const footerStyles = computed(() => ({
         v-if="config.variant === 'minimal'"
         class="footer-minimal"
       >
-        <p>&copy; 2024 Vue Smart Layout. All rights reserved.</p>
+        <p>&copy; 2026 AdaptiveAuth. All rights reserved.</p>
       </div>
 
       <div
@@ -69,7 +69,7 @@ const footerStyles = computed(() => ({
           <a href="/terms">Terms</a>
           <a href="/contact">Contact</a>
         </div>
-        <p>&copy; 2024 Vue Smart Layout</p>
+        <p>&copy; 2026 AdaptiveAuth</p>
       </div>
     </div>
   </footer>

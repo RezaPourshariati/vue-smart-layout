@@ -263,10 +263,10 @@ export const sendVerificationEmail = asyncHandler(async (req: AuthRequest, res: 
 
   const verificationUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/verify/${verificationToken}`
   await sendEmail(
-    'Verify Your Account - Smart Layout',
+    'Verify Your Account - AdaptiveAuth',
     user.email,
     process.env.EMAIL_USER || '',
-    'noreply@smart-layout.local',
+    'noreply@adaptive-auth.local',
     'verifyEmail',
     user.name,
     verificationUrl,
@@ -307,10 +307,10 @@ export const forgotPassword = asyncHandler(async (req: AuthRequest, res: Respons
   }).save()
   const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password/${resetToken}`
   await sendEmail(
-    'Password Reset Request - Smart Layout',
+    'Password Reset Request - AdaptiveAuth',
     user.email,
     process.env.EMAIL_USER || '',
-    'noreply@smart-layout.local',
+    'noreply@adaptive-auth.local',
     'forgotPassword',
     user.name,
     resetUrl,
@@ -357,13 +357,13 @@ export const sendLoginCode = asyncHandler(async (req: AuthRequest, res: Response
   const decryptedLoginCode = getCryptr().decrypt(userToken.loginToken)
 
   if (process.env.NODE_ENV === 'development')
-    console.log(`[smart-auth-dashboard] Login code for ${email}: ${decryptedLoginCode}`)
+    console.log(`[adaptive-auth] Login code for ${email}: ${decryptedLoginCode}`)
 
   await sendEmail(
-    'Login Access Code - Smart Layout',
+    'Login Access Code - AdaptiveAuth',
     email,
     process.env.EMAIL_USER || '',
-    'noreply@smart-layout.local',
+    'noreply@adaptive-auth.local',
     'loginCode',
     user.name,
     decryptedLoginCode,
