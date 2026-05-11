@@ -9,6 +9,13 @@ const message = ref('')
 const errorMessage = ref('')
 const roleDraft = ref<Record<string, UserRole>>({})
 
+const roleOptions: { label: string, value: UserRole }[] = [
+  { label: 'subscriber', value: 'subscriber' },
+  { label: 'author', value: 'author' },
+  { label: 'admin', value: 'admin' },
+  { label: 'suspended', value: 'suspended' },
+]
+
 function syncRoleDraft() {
   roleDraft.value = Object.fromEntries(authStore.users.map(user => [user._id, user.role]))
 }
@@ -69,81 +76,64 @@ async function handleRoleUpdate(id: string) {
       :message="errorMessage"
     />
 
-    <div class="overflow-x-auto rounded border">
-      <table class="min-w-full divide-y divide-gray-200 text-left text-sm">
-        <thead class="bg-gray-50">
-          <tr>
-            <th class="px-4 py-3 font-medium text-gray-700">
-              Name
-            </th>
-            <th class="px-4 py-3 font-medium text-gray-700">
-              Email
-            </th>
-            <th class="px-4 py-3 font-medium text-gray-700">
-              Role
-            </th>
-            <th class="px-4 py-3 font-medium text-gray-700">
-              Actions
-            </th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-100">
-          <tr
-            v-for="user in authStore.users"
-            :key="user._id"
-          >
-            <td class="px-4 py-3">
-              {{ user.name }}
-            </td>
-            <td class="px-4 py-3">
-              {{ user.email }}
-            </td>
-            <td class="px-4 py-3">
-              <select
-                v-model="roleDraft[user._id]"
-                class="rounded border px-2 py-1"
-              >
-                <option value="subscriber">
-                  subscriber
-                </option>
-                <option value="author">
-                  author
-                </option>
-                <option value="admin">
-                  admin
-                </option>
-                <option value="suspended">
-                  suspended
-                </option>
-              </select>
-            </td>
-            <td class="px-4 py-3">
-              <div class="flex gap-2">
-                <button
-                  class="rounded bg-blue-600 px-3 py-1 text-white"
-                  @click="handleRoleUpdate(user._id)"
-                >
-                  Update Role
-                </button>
-                <button
-                  class="rounded bg-red-600 px-3 py-1 text-white"
-                  @click="handleDelete(user._id)"
-                >
-                  Delete
-                </button>
-              </div>
-            </td>
-          </tr>
-          <tr v-if="authStore.users.length === 0">
-            <td
-              class="px-4 py-6 text-center text-gray-500"
-              colspan="4"
-            >
-              No users found.
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <DataTable
+      :value="authStore.users"
+      size="small"
+      striped-rows
+      show-gridlines
+      data-key="_id"
+      class="text-sm"
+      table-style="min-width: 50rem"
+    >
+      <template #empty>
+        <span class="text-gray-500">No users found.</span>
+      </template>
+      <Column
+        field="name"
+        header="Name"
+        :sortable="true"
+      />
+      <Column
+        field="email"
+        header="Email"
+        :sortable="true"
+      />
+      <Column
+        header="Role"
+        :sortable="false"
+      >
+        <template #body="{ data }">
+          <Select
+            v-model="roleDraft[data._id]"
+            :options="roleOptions"
+            option-label="label"
+            option-value="value"
+            placeholder="Role"
+            class="w-full min-w-40 md:w-56"
+          />
+        </template>
+      </Column>
+      <Column
+        header="Actions"
+        :exportable="false"
+        :sortable="false"
+      >
+        <template #body="{ data }">
+          <div class="flex flex-wrap gap-2">
+            <Button
+              label="Update Role"
+              size="small"
+              @click="handleRoleUpdate(data._id)"
+            />
+            <Button
+              label="Delete"
+              severity="danger"
+              size="small"
+              @click="handleDelete(data._id)"
+            />
+          </div>
+        </template>
+      </Column>
+    </DataTable>
   </section>
 </template>
