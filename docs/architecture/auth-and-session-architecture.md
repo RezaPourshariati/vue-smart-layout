@@ -7,7 +7,7 @@ How does authentication and session handling work end-to-end in this stack (SPA 
 ## Short answer
 
 - The SPA orchestrates refresh (`bootstrap`, `401` retry, shared in-flight dedupe); **`POST /api/auth/refresh`** is the only place refresh tokens rotate.
-- Protected APIs use an **access token** plus a **server-side session row** in the token store; **`protect`** validates access + session policy but does not refresh.
+- Protected APIs use an **access token** (`id + sid`) plus a **server-side session row**; **`protect`** validates both + session policy but does not refresh.
 - Session expiry (idle / absolute) is enforced server-side with stable **`SESSION_*_EXPIRED`** codes for UX and debugging.
 
 ## Current Architecture
@@ -26,7 +26,7 @@ How does authentication and session handling work end-to-end in this stack (SPA 
   - Shared in-flight refresh promise to dedupe concurrent `401` refresh attempts in one tab.
 - **Backend `protect` middleware**
   - Validate access token only.
-  - Validate active session record in token store.
+  - Validate active session record by `sid` + `userId`.
   - Enforce session policy + attach user.
 - **Backend `/refresh` endpoint**
   - Validate refresh token cookie and DB record.
@@ -66,13 +66,13 @@ export async function refreshSession(): Promise<{ message: string }> {
 // back-end/src/common/middleware/auth.middleware.ts
 const verified = jwt.verify(accessToken, accessSecret) as AuthJwtPayload
 const activeSession = await Token.findOne({
+  _id: verified.sid,
   userId: verified.id,
-  refreshToken: { $ne: '' },
 })
 const sessionExpiryCode = getSessionExpiryCode(activeSession)
 if (sessionExpiryCode) {
   await activeSession.deleteOne()
-  res.status(401).json({ code: sessionExpiryCode, message: 'Session expired, please login again' })
+  throw new UnauthorizedError('Session expired, please login again', sessionExpiryCode)
 }
 ```
 
@@ -83,12 +83,8 @@ if (sessionExpiryCode) {
 const verified = jwt.verify(refreshTokenCookie, refreshSecret) as { refreshToken: string, userId: string }
 const userToken = await Token.findOne({ userId: verified.userId, refreshToken: verified.refreshToken, expiresAt: { $gt: Date.now() } })
 
-const newRefreshTokenRaw = crypto.randomBytes(32).toString('hex') + user._id
-const nextRefreshToken = generateRefreshToken({ refreshToken: newRefreshTokenRaw, userId: user._id })
-const accessToken = generateToken(user._id)
-
-userToken.refreshToken = newRefreshTokenRaw
-await userToken.save()
+const { refreshToken: nextRefreshToken, sid } = await rotateExistingSession(userToken, user._id)
+const accessToken = generateToken(user._id, sid)
 setAuthCookies(res, accessToken, nextRefreshToken)
 ```
 

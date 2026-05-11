@@ -1,6 +1,21 @@
 import type { NextFunction, Request, Response } from 'express'
 
 const WRITE_METHODS = new Set(['POST', 'PATCH', 'PUT', 'DELETE'])
+const EXEMPT_WRITE_PATH_PREFIXES = [
+  '/login',
+  '/register',
+  '/refresh',
+  '/forgotPassword',
+  '/resetPassword/',
+  '/verifyUser/',
+  '/sendLoginCode/',
+  '/loginWithCode/',
+  '/google/callback',
+]
+
+function isExemptWritePath(path: string): boolean {
+  return EXEMPT_WRITE_PATH_PREFIXES.some(prefix => path === prefix || path.startsWith(prefix))
+}
 
 export function requireCsrf(req: Request, res: Response, next: NextFunction): void {
   if (!WRITE_METHODS.has(req.method)) {
@@ -8,8 +23,8 @@ export function requireCsrf(req: Request, res: Response, next: NextFunction): vo
     return
   }
 
-  // Login is exempt because the user has no auth cookies yet.
-  if (req.path === '/login') {
+  // Public bootstrap/auth routes are exempt because they can precede CSRF cookie issuance.
+  if (isExemptWritePath(req.path)) {
     next()
     return
   }

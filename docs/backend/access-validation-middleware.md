@@ -6,7 +6,7 @@ What does **`protect`** validate on each protected request, and what does it exp
 
 ## Short answer
 
-- Requires a valid **access token** and an **active session row** in the token store (non-empty refresh slot for that user).
+- Requires a valid **access token** with `{ id, sid }` and an **active session row** matching both values.
 - Runs **session policy** (`SESSION_IDLE_EXPIRED` / `SESSION_ABSOLUTE_EXPIRED`); may delete the row and return **`401` + code**.
 - May **touch `lastUsedAt`** on a throttled interval.
 - Does **not** read refresh cookies, rotate refresh tokens, or set new auth cookies.
@@ -16,7 +16,7 @@ What does **`protect`** validate on each protected request, and what does it exp
 `protect` performs:
 
 1. Access token verification (`JWT_SECRET`).
-2. Active session presence check in token store (`refreshToken != ''` for user).
+2. Active session presence check in token store (`_id = sid` and `userId = id`).
 3. Session policy enforcement (idle/absolute).
 4. Throttled activity touch (`lastUsedAt`).
 5. User lookup + role sanity checks.
@@ -29,17 +29,20 @@ It does **not** rotate refresh tokens or mint new cookies.
 ```ts
 // back-end/src/common/middleware/auth.middleware.ts
 if (!accessToken)
-  throw new Error('Not authorized, please login')
+  throw new UnauthorizedError('Not authorized, please login')
 
 const verified = jwt.verify(accessToken, accessSecret) as AuthJwtPayload
-const activeSession = await Token.findOne({ userId: verified.id, refreshToken: { $ne: '' } })
+const activeSession = await Token.findOne({
+  _id: verified.sid,
+  userId: verified.id,
+})
 if (!activeSession)
-  throw new Error('Not authorized, please login')
+  throw new UnauthorizedError('Not authorized, please login')
 
 const sessionExpiryCode = getSessionExpiryCode(activeSession)
 if (sessionExpiryCode) {
   await activeSession.deleteOne()
-  res.status(401).json({ code: sessionExpiryCode, message: 'Session expired, please login again' })
+  throw new UnauthorizedError('Session expired, please login again', sessionExpiryCode)
 }
 ```
 

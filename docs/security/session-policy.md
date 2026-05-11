@@ -63,8 +63,7 @@ export function shouldTouchLastUsed(lastUsedAt: Date, nowMs = Date.now()): boole
 const sessionExpiryCode = getSessionExpiryCode(activeSession)
 if (sessionExpiryCode) {
   await activeSession.deleteOne()
-  res.status(401).json({ code: sessionExpiryCode, message: 'Session expired, please login again' })
-  return
+  throw new UnauthorizedError('Session expired, please login again', sessionExpiryCode)
 }
 if (shouldTouchLastUsed(activeSession.lastUsedAt)) {
   activeSession.lastUsedAt = new Date()

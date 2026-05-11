@@ -3,6 +3,7 @@ import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import express from 'express'
 import errorHandler from './common/errors/error.middleware.js'
+import { requireCsrf } from './common/middleware/csrf.middleware.js'
 import { authRoutes } from './features/auth/index.js'
 import { userRoutes } from './features/users/index.js'
 
@@ -25,6 +26,7 @@ app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok' })
 })
 
+app.use('/api/auth', requireCsrf)
 app.use('/api/auth', authRoutes)
 app.use('/api/auth', userRoutes)
 app.use(errorHandler)

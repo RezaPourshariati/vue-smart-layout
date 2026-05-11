@@ -11,11 +11,30 @@ import {
   trustedDeviceFromRequest,
   userHasTrustedDevice,
 } from '../../common/device/trustedDevice.js'
+import {
+  BadRequestError,
+  ForbiddenError,
+  NotFoundError,
+  UnauthorizedError,
+} from '../../common/errors/app-error.js'
 import sendEmail from '../../common/utils/sendEmail.js'
 import Token from '../../models/token.model.js'
 import User from '../../models/user.model.js'
-import { buildSessionTimestamps, getRefreshLifetimeMs, getSessionExpiryCode } from '../../services/session-policy.service.js'
-import { generateRefreshToken, generateToken, hashToken } from '../../services/token.service.js'
+import { clearAuthCookies, setAuthCookies } from '../../services/auth-cookie.service.js'
+import {
+  createFreshSessionTokens,
+  rotateExistingSession,
+} from '../../services/auth-session.service.js'
+import {
+  findValidLoginCodeRecord,
+  findValidResetRecord,
+  findValidVerificationRecord,
+  replaceWithLoginCodeRecord,
+  replaceWithResetRecord,
+  replaceWithVerificationRecord,
+} from '../../services/auth-token-records.service.js'
+import { getSessionExpiryCode } from '../../services/session-policy.service.js'
+import { generateToken, hashToken } from '../../services/token.service.js'
 
 function getCryptr(): Cryptr {
   const key = process.env.CRYPTR_KEY
@@ -24,57 +43,36 @@ function getCryptr(): Cryptr {
   return new Cryptr(key)
 }
 
-function setAuthCookies(res: Response, accessToken: string, refreshToken?: string): void {
-  res.cookie('accessToken', accessToken, {
-    path: '/',
-    httpOnly: true,
-    sameSite: 'none',
-    secure: true,
-    maxAge: 1000 * 60 * 60 * 4,
-  })
-  if (refreshToken) {
-    const refreshLifetimeMs = getRefreshLifetimeMs()
-    res.cookie('refreshToken', refreshToken, {
-      path: '/',
-      httpOnly: true,
-      sameSite: 'none',
-      secure: true,
-      expires: new Date(Date.now() + refreshLifetimeMs),
-    })
-  }
-}
-
 export const registerUser = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
   const { name, email, password } = req.body as { name: string, email: string, password: string }
   if (!name || !email || !password)
-    throw new Error('Please fill in all required fields.')
+    throw new BadRequestError('Please fill in all required fields.')
   if (password.length < 8)
-    throw new Error('Password must be at least 8 characters!')
+    throw new BadRequestError('Password must be at least 8 characters!')
 
   const userExists = await User.findOne({ email })
   if (userExists)
-    throw new Error('This email already in use')
+    throw new BadRequestError('This email already in use')
 
   const device = trustedDeviceFromRequest(req)
   const user = await User.create({ name, email, password, userAgent: [device] })
-
-  const token = generateToken(user._id)
-  setAuthCookies(res, token)
+  const { accessToken, refreshToken } = await createFreshSessionTokens(user._id)
+  setAuthCookies(res, accessToken, refreshToken)
   res.status(201).json(user)
 })
 
 export const loginUser = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
   const { email, password } = req.body as { email: string, password: string }
   if (!email || !password)
-    throw new Error('Please fill in all required fields.')
+    throw new BadRequestError('Please fill in all required fields.')
 
   const user = await User.findOne({ email })
   if (!user)
-    throw new Error('User not found, Please signup')
+    throw new NotFoundError('User not found, Please signup')
 
   const passwordIsCorrect = await bcrypt.compare(password, user.password)
   if (!passwordIsCorrect)
-    throw new Error('Invalid email or password')
+    throw new UnauthorizedError('Invalid email or password')
 
   const currentDevice = trustedDeviceFromRequest(req)
   const allowedDevice = userHasTrustedDevice(user.userAgent, currentDevice)
@@ -82,37 +80,12 @@ export const loginUser = asyncHandler(async (req: AuthRequest, res: Response): P
     const cryptr = getCryptr()
     const loginCode = Math.floor(100000 + Math.random() * 900000)
     const encryptedLoginCode = cryptr.encrypt(loginCode.toString())
-
-    const userToken = await Token.findOne({ userId: user._id })
-    if (userToken)
-      await userToken.deleteOne()
-    await new Token({
-      userId: user._id,
-      loginToken: encryptedLoginCode,
-      createdAt: Date.now(),
-      expiresAt: Date.now() + 60 * 60 * 1000,
-    }).save()
-    res.status(400)
-    throw new Error('New browser or device detected.')
+    await replaceWithLoginCodeRecord(user._id, encryptedLoginCode)
+    throw new BadRequestError('New browser or device detected.')
   }
 
-  const newRefreshToken = crypto.randomBytes(32).toString('hex') + user._id
-  const accessToken = generateToken(user._id)
-  const refreshToken = generateRefreshToken({ refreshToken: newRefreshToken, userId: user._id })
+  const { accessToken, refreshToken } = await createFreshSessionTokens(user._id)
   setAuthCookies(res, accessToken, refreshToken)
-
-  const userToken = await Token.findOne({ userId: user._id })
-  if (userToken)
-    await userToken.deleteOne()
-  const sessionTimestamps = buildSessionTimestamps()
-  await new Token({
-    userId: user._id,
-    refreshToken: newRefreshToken,
-    createdAt: sessionTimestamps.createdAt,
-    expiresAt: sessionTimestamps.expiresAt,
-    lastUsedAt: sessionTimestamps.lastUsedAt,
-    sessionStartedAt: sessionTimestamps.sessionStartedAt,
-  }).save()
 
   res.status(200).json(user)
 })
@@ -134,26 +107,22 @@ export const logoutUser = asyncHandler(async (_req: AuthRequest, res: Response):
     }
   }
 
-  res.cookie('accessToken', '', { path: '/', httpOnly: true, expires: new Date(0), sameSite: 'none', secure: true })
-  res.cookie('refreshToken', '', { path: '/', httpOnly: true, expires: new Date(0), sameSite: 'none', secure: true })
+  clearAuthCookies(res)
   res.status(200).json({ message: 'Logout successful' })
 })
 
 export const refreshSession = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
   const refreshTokenCookie = req.cookies?.refreshToken as string | undefined
   const refreshSecret = process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET
-  if (!refreshTokenCookie || !refreshSecret) {
-    res.status(401).json({ message: 'Not authorized, please login' })
-    return
-  }
+  if (!refreshTokenCookie || !refreshSecret)
+    throw new UnauthorizedError('Not authorized, please login')
 
   let verified: { refreshToken: string, userId: string }
   try {
     verified = jwt.verify(refreshTokenCookie, refreshSecret) as { refreshToken: string, userId: string }
   }
   catch {
-    res.status(401).json({ message: 'Not authorized, please login' })
-    return
+    throw new UnauthorizedError('Not authorized, please login')
   }
 
   const userToken = await Token.findOne({
@@ -161,41 +130,22 @@ export const refreshSession = asyncHandler(async (req: AuthRequest, res: Respons
     refreshToken: verified.refreshToken,
     expiresAt: { $gt: Date.now() },
   })
-  if (!userToken) {
-    res.status(401).json({ message: 'Not authorized, please login' })
-    return
-  }
+  if (!userToken)
+    throw new UnauthorizedError('Not authorized, please login')
   const sessionExpiryCode = getSessionExpiryCode(userToken)
   if (sessionExpiryCode) {
     await userToken.deleteOne()
-    res.status(401).json({
-      code: sessionExpiryCode,
-      message: 'Session expired, please login again',
-    })
-    return
+    throw new UnauthorizedError('Session expired, please login again', sessionExpiryCode)
   }
 
   const user = await User.findById(verified.userId)
-  if (!user) {
-    res.status(401).json({ message: 'Not authorized, please login' })
-    return
-  }
-  if (user.role === 'suspended') {
-    res.status(403).json({ message: 'User suspended, please contact support' })
-    return
-  }
+  if (!user)
+    throw new UnauthorizedError('Not authorized, please login')
+  if (user.role === 'suspended')
+    throw new ForbiddenError('User suspended, please contact support')
 
-  const newRefreshTokenRaw = crypto.randomBytes(32).toString('hex') + user._id
-  const nextRefreshToken = generateRefreshToken({ refreshToken: newRefreshTokenRaw, userId: user._id })
-  const accessToken = generateToken(user._id)
-
-  userToken.refreshToken = newRefreshTokenRaw
-  const nextSession = buildSessionTimestamps(userToken.sessionStartedAt)
-  userToken.createdAt = nextSession.createdAt
-  userToken.lastUsedAt = nextSession.lastUsedAt
-  userToken.expiresAt = nextSession.expiresAt
-  userToken.sessionStartedAt = nextSession.sessionStartedAt
-  await userToken.save()
+  const { refreshToken: nextRefreshToken, sid } = await rotateExistingSession(userToken, user._id)
+  const accessToken = generateToken(user._id, sid)
 
   setAuthCookies(res, accessToken, nextRefreshToken)
   res.status(200).json({ message: 'Session refreshed' })
@@ -212,15 +162,15 @@ export const loginStatus = asyncHandler(async (req: AuthRequest, res: Response):
     res.json(false)
     return
   }
-  const verified = jwt.verify(accessToken, secret) as { id?: string }
-  if (!verified?.id) {
+  const verified = jwt.verify(accessToken, secret) as { id?: string, sid?: string }
+  if (!verified?.id || !verified?.sid) {
     res.json(false)
     return
   }
 
   const activeSession = await Token.findOne({
+    _id: verified.sid,
     userId: verified.id,
-    refreshToken: { $ne: '' },
   })
   if (!activeSession) {
     res.json(false)
@@ -230,11 +180,7 @@ export const loginStatus = asyncHandler(async (req: AuthRequest, res: Response):
   const sessionExpiryCode = getSessionExpiryCode(activeSession)
   if (sessionExpiryCode) {
     await activeSession.deleteOne()
-    res.status(401).json({
-      code: sessionExpiryCode,
-      message: 'Session expired, please login again',
-    })
-    return
+    throw new UnauthorizedError('Session expired, please login again', sessionExpiryCode)
   }
 
   res.json(true)
@@ -243,23 +189,15 @@ export const loginStatus = asyncHandler(async (req: AuthRequest, res: Response):
 export const sendVerificationEmail = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
   const user = await User.findById(req.user?._id)
   if (!user)
-    throw new Error('User not found!')
+    throw new NotFoundError('User not found!')
   if (user.isVerified)
-    throw new Error('User already verified')
+    throw new BadRequestError('User already verified')
 
-  const token = await Token.findOne({ userId: user._id })
-  if (token)
-    await token.deleteOne()
   const verificationToken = crypto.randomBytes(32).toString('hex') + user._id
   console.log(verificationToken)
   const hashedToken = hashToken(verificationToken)
   console.log('--->', hashedToken)
-  await new Token({
-    userId: user._id,
-    verificationToken: hashedToken,
-    createdAt: Date.now(),
-    expiresAt: Date.now() + 60 * 60 * 1000,
-  }).save()
+  await replaceWithVerificationRecord(user._id, hashedToken)
 
   const verificationUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/verify/${verificationToken}`
   await sendEmail(
@@ -277,12 +215,12 @@ export const sendVerificationEmail = asyncHandler(async (req: AuthRequest, res: 
 export const verifyUser = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
   const verificationToken = String(req.params.verificationToken || '')
   const hashedToken = hashToken(verificationToken)
-  const userToken = await Token.findOne({ verificationToken: hashedToken, expiresAt: { $gt: Date.now() } })
+  const userToken = await findValidVerificationRecord(hashedToken)
   if (!userToken)
-    throw new Error('Invalid or Expired Token')
+    throw new BadRequestError('Invalid or Expired Token')
   const user = await User.findById(userToken.userId)
   if (!user)
-    throw new Error('User not found')
+    throw new NotFoundError('User not found')
   user.isVerified = true
   await user.save()
   res.status(200).json({ message: 'Account verification was successful' })
@@ -292,19 +230,11 @@ export const forgotPassword = asyncHandler(async (req: AuthRequest, res: Respons
   const { email } = req.body as { email: string }
   const user = await User.findOne({ email })
   if (!user)
-    throw new Error('There is no user with this email')
+    throw new NotFoundError('There is no user with this email')
 
-  const token = await Token.findOne({ userId: user._id })
-  if (token)
-    await token.deleteOne()
   const resetToken = crypto.randomBytes(32).toString('hex') + user._id
   const hashedToken = hashToken(resetToken)
-  await new Token({
-    userId: user._id,
-    resetToken: hashedToken,
-    createdAt: Date.now(),
-    expiresAt: Date.now() + 60 * 60 * 1000,
-  }).save()
+  await replaceWithResetRecord(user._id, hashedToken)
   const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password/${resetToken}`
   await sendEmail(
     'Password Reset Request - AdaptiveAuth',
@@ -322,12 +252,12 @@ export const resetPassword = asyncHandler(async (req: AuthRequest, res: Response
   const resetToken = String(req.params.resetToken || '')
   const { password } = req.body as { password: string }
   const hashedToken = hashToken(resetToken)
-  const userToken = await Token.findOne({ resetToken: hashedToken, expiresAt: { $gt: Date.now() } })
+  const userToken = await findValidResetRecord(hashedToken)
   if (!userToken)
-    throw new Error('Invalid or Expired Token')
+    throw new BadRequestError('Invalid or Expired Token')
   const user = await User.findById(userToken.userId)
   if (!user)
-    throw new Error('User not found')
+    throw new NotFoundError('User not found')
   user.password = password
   await user.save()
   res.status(200).json({ message: 'Password reset was successful, Please login' })
@@ -337,10 +267,10 @@ export const changePassword = asyncHandler(async (req: AuthRequest, res: Respons
   const { oldPassword, password } = req.body as { oldPassword: string, password: string }
   const user = await User.findById(req.user?._id)
   if (!user)
-    throw new Error('User not found')
+    throw new NotFoundError('User not found')
   const passwordIsCorrect = await bcrypt.compare(oldPassword, user.password)
   if (!passwordIsCorrect)
-    throw new Error('Old password is incorrect')
+    throw new UnauthorizedError('Old password is incorrect')
   user.password = password
   await user.save()
   res.status(200).json({ message: 'Password changed successfully, please login again.' })
@@ -350,10 +280,10 @@ export const sendLoginCode = asyncHandler(async (req: AuthRequest, res: Response
   const email = String(req.params.email || '')
   const user = await User.findOne({ email })
   if (!user)
-    throw new Error('User not found')
-  const userToken = await Token.findOne({ userId: user._id, expiresAt: { $gt: Date.now() } })
+    throw new NotFoundError('User not found')
+  const userToken = await findValidLoginCodeRecord(user._id)
   if (!userToken)
-    throw new Error('Invalid or Expired Token, please login again')
+    throw new UnauthorizedError('Invalid or Expired Token, please login again')
   const decryptedLoginCode = getCryptr().decrypt(userToken.loginToken)
 
   if (process.env.NODE_ENV === 'development')
@@ -376,17 +306,17 @@ export const loginWithCode = asyncHandler(async (req: AuthRequest, res: Response
   const { loginCode } = req.body as { loginCode: string }
   const user = await User.findOne({ email })
   if (!user)
-    throw new Error('User not found')
-  const userToken = await Token.findOne({ userId: user._id, expiresAt: { $gt: Date.now() } })
+    throw new NotFoundError('User not found')
+  const userToken = await findValidLoginCodeRecord(user._id)
   if (!userToken)
-    throw new Error('Invalid or Expired Token, please login again')
+    throw new UnauthorizedError('Invalid or Expired Token, please login again')
   const decryptedLoginCode = getCryptr().decrypt(userToken.loginToken)
   if (loginCode !== decryptedLoginCode)
-    throw new Error('Incorrect login code, please try again')
+    throw new UnauthorizedError('Incorrect login code, please try again')
   user.set('userAgent', mergeTrustedDevice(user.userAgent, trustedDeviceFromRequest(req)))
   await user.save()
-  const token = generateToken(user._id)
-  setAuthCookies(res, token)
+  const { accessToken, refreshToken } = await createFreshSessionTokens(user._id)
+  setAuthCookies(res, accessToken, refreshToken)
   res.status(201).json(user)
 })
 
@@ -404,7 +334,7 @@ export const loginWithGoogle = asyncHandler(async (req: AuthRequest, res: Respon
   let user = await User.findOne({ email })
   if (!user)
     user = await User.create({ name, email, password, photo: picture, isVerified: true, userAgent: [initialDevice] })
-  const accessToken = generateToken(user._id)
-  setAuthCookies(res, accessToken)
+  const { accessToken, refreshToken } = await createFreshSessionTokens(user._id)
+  setAuthCookies(res, accessToken, refreshToken)
   res.status(201).json(user)
 })

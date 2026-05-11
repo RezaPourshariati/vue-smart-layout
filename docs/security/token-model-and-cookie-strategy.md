@@ -6,14 +6,15 @@ What tokens exist (access vs refresh), how are they represented (JWT + payload),
 
 ## Short answer
 
-- **Access token:** JWT (`JWT_SECRET`), short TTL, identifies the user for API calls.
+- **Access token:** JWT (`JWT_SECRET`), short TTL, carries `{ id, sid }` for session-bound API authorization.
 - **Refresh token:** JWT wrapping `{ refreshToken, userId }` (`JWT_REFRESH_SECRET` or fallback); **raw** refresh secret lives in the DB row for rotation checks.
-- Both are **`httpOnly` cookies** (`sameSite: 'none'`, `secure: true`); rotation happens only via **`/api/auth/refresh`**.
+- Access and refresh are **`httpOnly` cookies** (`sameSite: 'none'`, `secure: true`); CSRF uses a readable `csrfToken` cookie + `x-csrf-token` header on protected write routes.
 
 ## Current Token Model
 
 - **Access token**
   - JWT signed with `JWT_SECRET`
+  - Payload contains `{ id, sid }`
   - Short-lived (4 hours)
   - Used for protected API authorization
 - **Refresh token**
@@ -35,26 +36,21 @@ What tokens exist (access vs refresh), how are they represented (JWT + payload),
 
 ```ts
 // back-end/src/services/token.service.ts
-export function generateToken(id: Types.ObjectId | string): string {
-  return jwt.sign({ id: id.toString() }, secret, { expiresIn: '4h' })
+export function generateToken(id: Types.ObjectId | string, sid: string): string {
+  return jwt.sign({ id: id.toString(), sid }, secret, { expiresIn: '4h' })
 }
 
 export function generateRefreshToken({ refreshToken, userId }: { refreshToken: string, userId: Types.ObjectId | string }): string {
-  return jwt.sign({ refreshToken, userId: userId.toString() }, secret, { expiresIn: '2d' })
+  return jwt.sign({ refreshToken, userId: userId.toString() }, secret, { expiresIn: getRefreshLifetimeSeconds() })
 }
 ```
 
 ### Cookie issuance
 
 ```ts
-// back-end/src/features/auth/controller.ts
-res.cookie('accessToken', accessToken, {
-  path: '/',
-  httpOnly: true,
-  sameSite: 'none',
-  secure: true,
-  maxAge: 1000 * 60 * 60 * 4,
-})
+// back-end/src/services/auth-cookie.service.ts
+setAuthCookies(res, accessToken, refreshToken)
+// sets: accessToken (httpOnly), refreshToken (httpOnly), csrfToken (readable)
 ```
 
 ### Refresh cookie rotation

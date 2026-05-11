@@ -50,9 +50,8 @@ const userToken = await Token.findOne({
 
 ```ts
 // back-end/src/features/auth/controller.ts
-const newRefreshTokenRaw = crypto.randomBytes(32).toString('hex') + user._id
-const nextRefreshToken = generateRefreshToken({ refreshToken: newRefreshTokenRaw, userId: user._id })
-const accessToken = generateToken(user._id)
+const { refreshToken: nextRefreshToken, sid } = await rotateExistingSession(userToken, user._id)
+const accessToken = generateToken(user._id, sid)
 setAuthCookies(res, accessToken, nextRefreshToken)
 ```
 

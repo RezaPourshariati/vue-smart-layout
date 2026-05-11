@@ -34,11 +34,9 @@ Which **stable `code` values** does the auth/session layer return, and how shoul
 ## Key Code Anchors
 
 ```ts
-// back-end/src/common/middleware/auth.middleware.ts
-res.status(401).json({
-  code: sessionExpiryCode,
-  message: 'Session expired, please login again',
-})
+// back-end/src/features/auth/controller.ts (and auth middleware)
+throw new UnauthorizedError('Session expired, please login again', sessionExpiryCode)
+// error middleware serializes: { code, message }
 ```
 
 ```ts

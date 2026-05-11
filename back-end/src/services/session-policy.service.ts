@@ -20,6 +20,11 @@ export function getRefreshLifetimeMs(): number {
   return readMsEnv('REFRESH_TOKEN_LIFETIME_MS', DEFAULT_REFRESH_LIFETIME_MS)
 }
 
+export function getRefreshLifetimeSeconds(): number {
+  // jsonwebtoken accepts integer seconds for numeric expiresIn values.
+  return Math.max(1, Math.floor(getRefreshLifetimeMs() / 1000))
+}
+
 export function getSessionIdleTimeoutMs(): number {
   return readMsEnv('SESSION_IDLE_TIMEOUT_MS', DEFAULT_IDLE_TIMEOUT_MS)
 }

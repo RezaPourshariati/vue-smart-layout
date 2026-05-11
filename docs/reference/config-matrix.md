@@ -17,7 +17,7 @@ Which **environment variables** control auth/session behavior, what are sensible
 | ------------------------------------- | ------------------------ | ------------------------------ | ------------------------------ |
 | `JWT_SECRET`                          | required                 | token signing/verification     | Access token validity          |
 | `JWT_REFRESH_SECRET`                  | fallback to `JWT_SECRET` | refresh signing/verification   | Refresh token integrity        |
-| `REFRESH_TOKEN_LIFETIME_MS`           | `172800000` (2d)         | session policy + cookie expiry | Rolling refresh window         |
+| `REFRESH_TOKEN_LIFETIME_MS`           | `172800000` (2d)         | refresh JWT + session policy + cookie expiry | Rolling refresh window |
 | `SESSION_IDLE_TIMEOUT_MS`             | `1800000` (30m)          | session policy checks          | Max inactivity before logout   |
 | `SESSION_LAST_USED_TOUCH_INTERVAL_MS` | `30000` (30s)            | middleware touch logic         | DB write throttle for activity |
 | `SESSION_ABSOLUTE_TIMEOUT_MS`         | `2592000000` (30d)       | session policy checks          | Max total session age          |
@@ -44,9 +44,11 @@ return readMsEnv('SESSION_IDLE_TIMEOUT_MS', DEFAULT_IDLE_TIMEOUT_MS)
 
 ```ts
 // back-end/src/server.ts
-if (configuredTouchMs > configuredIdleMs) {
-  console.warn('[adaptive-auth] SESSION_LAST_USED_TOUCH_INTERVAL_MS is greater than SESSION_IDLE_TIMEOUT_MS...')
-}
+warnOnSessionPolicyMisconfiguration()
+// warns on:
+// - touch interval > idle timeout (clamped)
+// - refresh lifetime < idle timeout
+// - absolute timeout < idle timeout
 ```
 
 ## Out of scope for this page

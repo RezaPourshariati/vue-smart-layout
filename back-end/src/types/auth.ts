@@ -36,6 +36,7 @@ export interface AuthRequest extends Request {
 
 export interface AuthJwtPayload {
   id: string
+  sid: string
   iat?: number
   exp?: number
 }
