@@ -25,12 +25,12 @@
     "lint:fix:back-end": "eslint ./back-end/src --fix"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^5.3.0",
-    "@types/node": "^24.5.1",
-    "@unocss/eslint-plugin": "^66.5.1",
-    "eslint": "^9.35.0",
-    "eslint-plugin-format": "^1.0.1",
-    "npm-run-all2": "^7.0.2",
-    "typescript": "^5.9.2"
+    "@antfu/eslint-config": "^8.2.0",
+    "@types/node": "^25.6.2",
+    "@unocss/eslint-plugin": "^66.6.8",
+    "eslint": "^10.3.0",
+    "eslint-plugin-format": "^2.0.1",
+    "npm-run-all2": "^8.0.4",
+    "typescript": "^6.0.3"
   }
 }

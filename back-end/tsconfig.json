@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "baseUrl": ".",
     "rootDir": "src",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
@@ -9,7 +8,6 @@
     "allowJs": true,
     "strict": true,
     "noImplicitAny": false,
-    "downlevelIteration": true,
     "importHelpers": false,
     "outDir": "dist",
     "preserveConstEnums": true,
