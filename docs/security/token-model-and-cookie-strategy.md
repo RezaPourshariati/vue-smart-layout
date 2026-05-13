@@ -29,6 +29,7 @@ What tokens exist (access vs refresh), how are they represented (JWT + payload),
 - `accessToken`: `httpOnly`, `sameSite: 'none'`, `secure: true`
 - `refreshToken`: `httpOnly`, `sameSite: 'none'`, `secure: true`
 - Cookies are rotated server-side on refresh.
+- In `NODE_ENV=test`, cookies use `secure: false` and `sameSite: 'lax'` so HTTP-based integration tests (for example Vitest + Supertest) can exercise cookie flows without TLS.
 
 ## Key Code Anchors
 

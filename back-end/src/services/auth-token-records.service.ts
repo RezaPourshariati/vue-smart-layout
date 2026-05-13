@@ -47,21 +47,21 @@ export async function replaceWithResetRecord(userId: TokenUserId, resetTokenHash
 }
 
 export async function findValidVerificationRecord(verificationTokenHash: string) {
-  return await Token.findOne({
+  return Token.findOne({
     verificationToken: verificationTokenHash,
     expiresAt: { $gt: Date.now() },
   })
 }
 
 export async function findValidResetRecord(resetTokenHash: string) {
-  return await Token.findOne({
+  return Token.findOne({
     resetToken: resetTokenHash,
     expiresAt: { $gt: Date.now() },
   })
 }
 
 export async function findValidLoginCodeRecord(userId: TokenUserId) {
-  return await Token.findOne({
+  return Token.findOne({
     userId,
     loginToken: { $ne: '' },
     expiresAt: { $gt: Date.now() },
