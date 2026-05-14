@@ -19,9 +19,9 @@ What happens from **`POST /api/auth/refresh`** through cookie updates, and when 
 
 1. Frontend calls `POST /api/auth/refresh`.
 2. Backend verifies refresh cookie JWT.
-3. Backend finds matching token record (`userId + refreshToken + expiresAt > now`).
+3. Backend finds matching session row in **`sessions`** (`userId + refreshToken + expiresAt > now`).
 4. Backend checks session policy; if expired -> delete record + `401` with code.
-5. Backend rotates refresh token raw value, updates token store timestamps.
+5. Backend rotates refresh token raw value, updates **`sessions`** timestamps.
 6. Backend sets new access + refresh cookies.
 7. Frontend retries failed request once (or continues bootstrap fetch user).
 
@@ -39,7 +39,7 @@ refreshInFlight = request<{ message: string }>('/refresh', { method: 'POST' }, f
 ```ts
 // back-end/src/features/auth/controller.ts
 const verified = jwt.verify(refreshTokenCookie, refreshSecret) as { refreshToken: string, userId: string }
-const userToken = await Token.findOne({
+const userToken = await Session.findOne({
   userId: verified.userId,
   refreshToken: verified.refreshToken,
   expiresAt: { $gt: Date.now() },
@@ -64,7 +64,7 @@ setAuthCookies(res, accessToken, nextRefreshToken)
 
 - `401 Not authorized, please login`:
   - missing/invalid refresh cookie,
-  - no matching token store record.
+  - no matching **`sessions`** row.
 - `401` with `SESSION_IDLE_EXPIRED` or `SESSION_ABSOLUTE_EXPIRED`:
   - policy-enforced session termination.
 

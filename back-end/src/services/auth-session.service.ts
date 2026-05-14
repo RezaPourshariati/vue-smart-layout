@@ -1,6 +1,7 @@
 import type { Types } from 'mongoose'
+import type { ISession } from '../types/auth.js'
 import crypto from 'node:crypto'
-import Token from '../models/token.model.js'
+import Session from '../models/session.model.js'
 import { buildSessionTimestamps } from './session-policy.service.js'
 import { generateRefreshToken, generateToken } from './token.service.js'
 
@@ -13,12 +14,9 @@ export async function issueRefreshTokenForUser(userId: SessionUserId): Promise<{
 }
 
 export async function replaceUserSession(userId: SessionUserId, refreshTokenRaw: string): Promise<string> {
-  const userToken = await Token.findOne({ userId })
-  if (userToken)
-    await userToken.deleteOne()
-
+  await Session.deleteMany({ userId })
   const sessionTimestamps = buildSessionTimestamps()
-  const createdSession = await new Token({
+  const createdSession = await new Session({
     userId,
     refreshToken: refreshTokenRaw,
     createdAt: sessionTimestamps.createdAt,
@@ -30,21 +28,21 @@ export async function replaceUserSession(userId: SessionUserId, refreshTokenRaw:
 }
 
 export async function rotateExistingSession(
-  userToken: InstanceType<typeof Token>,
+  sessionDoc: ISession,
   userId: SessionUserId,
 ): Promise<{ refreshToken: string, sid: string }> {
   const refreshTokenRaw = crypto.randomBytes(32).toString('hex') + userId
   const refreshToken = generateRefreshToken({ refreshToken: refreshTokenRaw, userId })
 
-  userToken.refreshToken = refreshTokenRaw
-  const nextSession = buildSessionTimestamps(userToken.sessionStartedAt)
-  userToken.createdAt = nextSession.createdAt
-  userToken.lastUsedAt = nextSession.lastUsedAt
-  userToken.expiresAt = nextSession.expiresAt
-  userToken.sessionStartedAt = nextSession.sessionStartedAt
-  await userToken.save()
+  sessionDoc.refreshToken = refreshTokenRaw
+  const nextSession = buildSessionTimestamps(sessionDoc.sessionStartedAt)
+  sessionDoc.createdAt = nextSession.createdAt
+  sessionDoc.lastUsedAt = nextSession.lastUsedAt
+  sessionDoc.expiresAt = nextSession.expiresAt
+  sessionDoc.sessionStartedAt = nextSession.sessionStartedAt
+  await sessionDoc.save()
 
-  return { refreshToken, sid: userToken._id.toString() }
+  return { refreshToken, sid: sessionDoc._id.toString() }
 }
 
 export async function createFreshSessionTokens(

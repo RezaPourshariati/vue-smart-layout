@@ -34,7 +34,7 @@ SESSION_ABSOLUTE_TIMEOUT_MS=2592000000
 ```ts
 // back-end/src/services/session-policy.service.ts
 export function getSessionExpiryCode(
-  token: Pick<IToken, 'sessionStartedAt' | 'lastUsedAt'>,
+  token: Pick<ISession, 'sessionStartedAt' | 'lastUsedAt'>,
   nowMs = Date.now(),
 ): SessionExpiryCode | null {
   const idleExceeded = token.lastUsedAt.getTime() + getSessionIdleTimeoutMs() <= nowMs

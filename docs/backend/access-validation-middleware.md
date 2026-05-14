@@ -16,7 +16,7 @@ What does **`protect`** validate on each protected request, and what does it exp
 `protect` performs:
 
 1. Access token verification (`JWT_SECRET`).
-2. Active session presence check in token store (`_id = sid` and `userId = id`).
+2. Active session presence check in **`sessions`** (`_id = sid` and `userId = id`).
 3. Session policy enforcement (idle/absolute).
 4. Throttled activity touch (`lastUsedAt`).
 5. User lookup + role sanity checks.
@@ -32,7 +32,7 @@ if (!accessToken)
   throw new UnauthorizedError('Not authorized, please login')
 
 const verified = jwt.verify(accessToken, accessSecret) as AuthJwtPayload
-const activeSession = await Token.findOne({
+const activeSession = await Session.findOne({
   _id: verified.sid,
   userId: verified.id,
 })

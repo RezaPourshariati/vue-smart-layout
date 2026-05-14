@@ -2,7 +2,7 @@ import type { NextFunction, Response } from 'express'
 import type { AuthJwtPayload, AuthRequest } from '../../types/auth.js'
 import asyncHandler from 'express-async-handler'
 import jwt from 'jsonwebtoken'
-import Token from '../../models/token.model.js'
+import Session from '../../models/session.model.js'
 import User from '../../models/user.model.js'
 import { getSessionExpiryCode, shouldTouchLastUsed } from '../../services/session-policy.service.js'
 import { ForbiddenError, UnauthorizedError } from '../errors/app-error.js'
@@ -19,7 +19,7 @@ export const protect = asyncHandler(async (req: AuthRequest, res: Response, next
     const verified = jwt.verify(accessToken, accessSecret) as AuthJwtPayload
     if (!verified?.sid)
       throw new UnauthorizedError('Not authorized, please login')
-    const activeSession = await Token.findOne({
+    const activeSession = await Session.findOne({
       _id: verified.sid,
       userId: verified.id,
     })

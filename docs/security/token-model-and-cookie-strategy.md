@@ -21,8 +21,14 @@ What tokens exist (access vs refresh), how are they represented (JWT + payload),
   - JWT signed with `JWT_REFRESH_SECRET` (fallback `JWT_SECRET`)
   - Contains `{ refreshToken, userId }`
   - Rotated only by `/api/auth/refresh`
-- **Revocation store**
-  - `Token` collection stores current refresh token record and session timestamps.
+- **Revocation store (sessions)**
+  - MongoDB collection **`sessions`** stores the active refresh secret per session row, rolling expiry, and idle/absolute policy timestamps. Access JWT **`sid`** is the session document **`_id`**.
+- **One-time flows (separate collections)**
+  - **`email_verification_tokens`**: hashed verify link, TTL ~1h.
+  - **`password_reset_tokens`**: hashed reset link, TTL ~1h.
+  - **`login_challenges`**: encrypted device login code, TTL ~1h.
+
+The legacy multiplexed **`tokens`** collection is no longer used; existing deployments should run a one-off migration or accept that old rows are ignored until cleaned up.
 
 ## Current Cookie Strategy
 

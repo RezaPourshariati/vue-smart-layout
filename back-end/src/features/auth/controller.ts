@@ -18,7 +18,7 @@ import {
   UnauthorizedError,
 } from '../../common/errors/app-error.js'
 import sendEmail from '../../common/utils/sendEmail.js'
-import Token from '../../models/token.model.js'
+import Session from '../../models/session.model.js'
 import User from '../../models/user.model.js'
 import { clearAuthCookies, setAuthCookies } from '../../services/auth-cookie.service.js'
 import {
@@ -97,7 +97,7 @@ export const logoutUser = asyncHandler(async (_req: AuthRequest, res: Response):
   if (refreshTokenCookie && refreshSecret) {
     try {
       const verified = jwt.verify(refreshTokenCookie, refreshSecret) as { refreshToken: string, userId: string }
-      await Token.findOneAndDelete({
+      await Session.findOneAndDelete({
         userId: verified.userId,
         refreshToken: verified.refreshToken,
       })
@@ -125,7 +125,7 @@ export const refreshSession = asyncHandler(async (req: AuthRequest, res: Respons
     throw new UnauthorizedError('Not authorized, please login')
   }
 
-  const userToken = await Token.findOne({
+  const userToken = await Session.findOne({
     userId: verified.userId,
     refreshToken: verified.refreshToken,
     expiresAt: { $gt: Date.now() },
@@ -168,7 +168,7 @@ export const loginStatus = asyncHandler(async (req: AuthRequest, res: Response):
     return
   }
 
-  const activeSession = await Token.findOne({
+  const activeSession = await Session.findOne({
     _id: verified.sid,
     userId: verified.id,
   })
@@ -223,6 +223,7 @@ export const verifyUser = asyncHandler(async (req: AuthRequest, res: Response): 
     throw new NotFoundError('User not found')
   user.isVerified = true
   await user.save()
+  await userToken.deleteOne()
   res.status(200).json({ message: 'Account verification was successful' })
 })
 
@@ -260,6 +261,7 @@ export const resetPassword = asyncHandler(async (req: AuthRequest, res: Response
     throw new NotFoundError('User not found')
   user.password = password
   await user.save()
+  await userToken.deleteOne()
   res.status(200).json({ message: 'Password reset was successful, Please login' })
 })
 
@@ -284,7 +286,7 @@ export const sendLoginCode = asyncHandler(async (req: AuthRequest, res: Response
   const userToken = await findValidLoginCodeRecord(user._id)
   if (!userToken)
     throw new UnauthorizedError('Invalid or Expired Token, please login again')
-  const decryptedLoginCode = getCryptr().decrypt(userToken.loginToken)
+  const decryptedLoginCode = getCryptr().decrypt(userToken.encryptedLoginCode)
 
   if (process.env.NODE_ENV === 'development')
     console.log(`[adaptive-auth] Login code for ${email}: ${decryptedLoginCode}`)
@@ -310,11 +312,12 @@ export const loginWithCode = asyncHandler(async (req: AuthRequest, res: Response
   const userToken = await findValidLoginCodeRecord(user._id)
   if (!userToken)
     throw new UnauthorizedError('Invalid or Expired Token, please login again')
-  const decryptedLoginCode = getCryptr().decrypt(userToken.loginToken)
+  const decryptedLoginCode = getCryptr().decrypt(userToken.encryptedLoginCode)
   if (loginCode !== decryptedLoginCode)
     throw new UnauthorizedError('Incorrect login code, please try again')
   user.set('userAgent', mergeTrustedDevice(user.userAgent, trustedDeviceFromRequest(req)))
   await user.save()
+  await userToken.deleteOne()
   const { accessToken, refreshToken } = await createFreshSessionTokens(user._id)
   setAuthCookies(res, accessToken, refreshToken)
   res.status(201).json(user)

@@ -19,7 +19,7 @@ When does the server return **`SESSION_IDLE_EXPIRED`** vs **`SESSION_ABSOLUTE_EX
 ## Flow: Access-Token Protected Request
 
 1. Middleware verifies access token.
-2. Middleware loads active session record from token store.
+2. Middleware loads active session row from **`sessions`**.
 3. Middleware computes expiry reason:
    - idle exceeded -> `SESSION_IDLE_EXPIRED`
    - absolute exceeded -> `SESSION_ABSOLUTE_EXPIRED`
@@ -32,7 +32,7 @@ When does the server return **`SESSION_IDLE_EXPIRED`** vs **`SESSION_ABSOLUTE_EX
 
 ## Flow: Explicit Refresh (`/api/auth/refresh`)
 
-1. Backend validates refresh cookie + token store record.
+1. Backend validates refresh cookie + **`sessions`** row.
 2. Same expiry-code check runs.
 3. If expired -> delete session + return `401` with code.
 4. If valid -> rotate refresh token and issue fresh cookies.

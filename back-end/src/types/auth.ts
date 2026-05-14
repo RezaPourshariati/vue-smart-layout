@@ -17,17 +17,39 @@ export interface IUser extends Document {
   updatedAt: Date
 }
 
-export interface IToken extends Document {
+/** Refresh-backed browser session (access JWT `sid` = this document `_id`). */
+export interface ISession extends Document {
   _id: Types.ObjectId
   userId: Types.ObjectId
-  verificationToken: string
-  resetToken: string
   refreshToken: string
-  loginToken: string
   createdAt: Date
   expiresAt: Date
   sessionStartedAt: Date
   lastUsedAt: Date
+}
+
+/** One-time email verification token (hashed opaque value). */
+export interface IEmailVerificationToken extends Document {
+  userId: Types.ObjectId
+  tokenHash: string
+  createdAt: Date
+  expiresAt: Date
+}
+
+/** One-time password reset token (hashed opaque value). */
+export interface IPasswordResetToken extends Document {
+  userId: Types.ObjectId
+  tokenHash: string
+  createdAt: Date
+  expiresAt: Date
+}
+
+/** Short-lived encrypted login code for new-device flow. */
+export interface ILoginChallenge extends Document {
+  userId: Types.ObjectId
+  encryptedLoginCode: string
+  createdAt: Date
+  expiresAt: Date
 }
 
 export interface AuthRequest extends Request {

@@ -65,7 +65,7 @@ export async function refreshSession(): Promise<{ message: string }> {
 ```ts
 // back-end/src/common/middleware/auth.middleware.ts
 const verified = jwt.verify(accessToken, accessSecret) as AuthJwtPayload
-const activeSession = await Token.findOne({
+const activeSession = await Session.findOne({
   _id: verified.sid,
   userId: verified.id,
 })
@@ -81,7 +81,7 @@ if (sessionExpiryCode) {
 ```ts
 // back-end/src/features/auth/controller.ts
 const verified = jwt.verify(refreshTokenCookie, refreshSecret) as { refreshToken: string, userId: string }
-const userToken = await Token.findOne({ userId: verified.userId, refreshToken: verified.refreshToken, expiresAt: { $gt: Date.now() } })
+const userToken = await Session.findOne({ userId: verified.userId, refreshToken: verified.refreshToken, expiresAt: { $gt: Date.now() } })
 
 const { refreshToken: nextRefreshToken, sid } = await rotateExistingSession(userToken, user._id)
 const accessToken = generateToken(user._id, sid)

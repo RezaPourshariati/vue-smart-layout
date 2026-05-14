@@ -3,7 +3,10 @@ import { MongoMemoryServer } from 'mongodb-memory-server'
 import mongoose from 'mongoose'
 import request from 'supertest'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
-import Token from '../src/models/token.model.js'
+import EmailVerificationToken from '../src/models/email-verification-token.model.js'
+import LoginChallenge from '../src/models/login-challenge.model.js'
+import PasswordResetToken from '../src/models/password-reset-token.model.js'
+import Session from '../src/models/session.model.js'
 import User from '../src/models/user.model.js'
 
 const TEST_UA
@@ -59,7 +62,10 @@ describe('auth integration', () => {
 
   beforeEach(async () => {
     await User.deleteMany({})
-    await Token.deleteMany({})
+    await Session.deleteMany({})
+    await EmailVerificationToken.deleteMany({})
+    await PasswordResetToken.deleteMany({})
+    await LoginChallenge.deleteMany({})
   })
 
   afterAll(async () => {

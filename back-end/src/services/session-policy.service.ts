@@ -1,4 +1,4 @@
-import type { IToken } from '../types/auth.js'
+import type { ISession } from '../types/auth.js'
 
 const DEFAULT_REFRESH_LIFETIME_MS = 1000 * 60 * 60 * 24 * 2 // 2d
 const DEFAULT_IDLE_TIMEOUT_MS = 1000 * 60 * 30 // 30m
@@ -49,12 +49,12 @@ export function buildSessionTimestamps(sessionStartedAt?: Date) {
   }
 }
 
-export function isSessionExpired(token: Pick<IToken, 'sessionStartedAt' | 'lastUsedAt'>, nowMs = Date.now()): boolean {
+export function isSessionExpired(token: Pick<ISession, 'sessionStartedAt' | 'lastUsedAt'>, nowMs = Date.now()): boolean {
   return getSessionExpiryCode(token, nowMs) !== null
 }
 
 export function getSessionExpiryCode(
-  token: Pick<IToken, 'sessionStartedAt' | 'lastUsedAt'>,
+  token: Pick<ISession, 'sessionStartedAt' | 'lastUsedAt'>,
   nowMs = Date.now(),
 ): SessionExpiryCode | null {
   const idleExceeded = token.lastUsedAt.getTime() + getSessionIdleTimeoutMs() <= nowMs

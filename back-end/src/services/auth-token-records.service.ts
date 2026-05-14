@@ -1,69 +1,59 @@
 import type { Types } from 'mongoose'
-import Token from '../models/token.model.js'
+import EmailVerificationToken from '../models/email-verification-token.model.js'
+import LoginChallenge from '../models/login-challenge.model.js'
+import PasswordResetToken from '../models/password-reset-token.model.js'
 
 type TokenUserId = Types.ObjectId | string
 
 const ONE_HOUR_MS = 60 * 60 * 1000
 
-async function replaceUserTokenRecord(payload: {
-  userId: TokenUserId
-  loginToken?: string
-  verificationToken?: string
-  resetToken?: string
-  ttlMs?: number
-}): Promise<void> {
-  const {
+export async function replaceWithLoginCodeRecord(userId: TokenUserId, encryptedLoginCode: string): Promise<void> {
+  await LoginChallenge.deleteMany({ userId })
+  await new LoginChallenge({
     userId,
-    loginToken = '',
-    verificationToken = '',
-    resetToken = '',
-    ttlMs = ONE_HOUR_MS,
-  } = payload
-
-  const existing = await Token.findOne({ userId })
-  if (existing)
-    await existing.deleteOne()
-
-  await new Token({
-    userId,
-    loginToken,
-    verificationToken,
-    resetToken,
-    createdAt: Date.now(),
-    expiresAt: Date.now() + ttlMs,
+    encryptedLoginCode,
+    createdAt: new Date(),
+    expiresAt: new Date(Date.now() + ONE_HOUR_MS),
   }).save()
 }
 
-export async function replaceWithLoginCodeRecord(userId: TokenUserId, encryptedLoginCode: string): Promise<void> {
-  await replaceUserTokenRecord({ userId, loginToken: encryptedLoginCode })
-}
-
 export async function replaceWithVerificationRecord(userId: TokenUserId, verificationTokenHash: string): Promise<void> {
-  await replaceUserTokenRecord({ userId, verificationToken: verificationTokenHash })
+  await EmailVerificationToken.deleteMany({ userId })
+  await new EmailVerificationToken({
+    userId,
+    tokenHash: verificationTokenHash,
+    createdAt: new Date(),
+    expiresAt: new Date(Date.now() + ONE_HOUR_MS),
+  }).save()
 }
 
 export async function replaceWithResetRecord(userId: TokenUserId, resetTokenHash: string): Promise<void> {
-  await replaceUserTokenRecord({ userId, resetToken: resetTokenHash })
+  await PasswordResetToken.deleteMany({ userId })
+  await new PasswordResetToken({
+    userId,
+    tokenHash: resetTokenHash,
+    createdAt: new Date(),
+    expiresAt: new Date(Date.now() + ONE_HOUR_MS),
+  }).save()
 }
 
 export async function findValidVerificationRecord(verificationTokenHash: string) {
-  return Token.findOne({
-    verificationToken: verificationTokenHash,
+  return EmailVerificationToken.findOne({
+    tokenHash: verificationTokenHash,
     expiresAt: { $gt: Date.now() },
   })
 }
 
 export async function findValidResetRecord(resetTokenHash: string) {
-  return Token.findOne({
-    resetToken: resetTokenHash,
+  return PasswordResetToken.findOne({
+    tokenHash: resetTokenHash,
     expiresAt: { $gt: Date.now() },
   })
 }
 
 export async function findValidLoginCodeRecord(userId: TokenUserId) {
-  return Token.findOne({
+  return LoginChallenge.findOne({
     userId,
-    loginToken: { $ne: '' },
     expiresAt: { $gt: Date.now() },
   })
 }
