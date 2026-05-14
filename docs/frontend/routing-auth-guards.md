@@ -13,6 +13,8 @@ How does Vue Router decide who can see which route, when does it run `bootstrapA
 
 ## Guard sequence
 
+Logic lives in **`resolveAuthRedirect`** (`front-end/src/app/router/auth-navigation-guard.ts`) and is invoked from **`router.beforeEach`**.
+
 1. Resolve Pinia **`auth`** store.
 2. If **`!authChecked`** → **`await bootstrapAuth()`** (refresh-first session restore).
 3. **`guestOnly`** + authenticated → redirect **`Home`**.
@@ -27,27 +29,23 @@ How does Vue Router decide who can see which route, when does it run `bootstrapA
 // front-end/src/app/router/index.ts
 router.beforeEach(async (to) => {
   const authStore = useAuthStore()
-
-  if (!authStore.authChecked)
-    await authStore.bootstrapAuth()
-
-  if (to.meta.guestOnly && authStore.isAuthenticated)
-    return { name: 'Home' }
-
-  if (to.meta.requiresAuth && !authStore.isAuthenticated) {
-    const query: Record<string, string> = { redirect: to.fullPath }
-    if (authStore.sessionExpiryCode)
-      query.session = authStore.sessionExpiryCode
-    return { name: 'Login', query }
-  }
-
-  if (to.meta.roles?.length) {
-    const hasAnyRole = to.meta.roles.some(role => authStore.hasRole(role))
-    if (!hasAnyRole)
-      return { name: 'Unauthorized' }
-  }
+  const resolved = await resolveAuthRedirect(to, authStore)
+  if (resolved === true)
+    return
+  return resolved
 })
 ```
+
+### Pure redirect resolver (unit-tested)
+
+```ts
+// front-end/src/app/router/auth-navigation-guard.ts
+export async function resolveAuthRedirect(to, authStore) { /* ... */ }
+```
+
+### Pinia + in-memory router (integration)
+
+`front-end/tests/router-integration.test.ts` builds a small **`createMemoryHistory`** router with the same **`beforeEach` → `resolveAuthRedirect`** wiring as production, then asserts navigation results for guest, auth, and role cases (including **`bootstrapAuth`** when `authChecked` is false).
 
 ### Safe post-login redirect + session UX
 

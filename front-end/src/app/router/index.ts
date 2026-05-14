@@ -1,5 +1,6 @@
 import type { RouteRecordRaw } from 'vue-router'
 import { createRouter, createWebHistory } from 'vue-router'
+import { resolveAuthRedirect } from '@/app/router/auth-navigation-guard'
 import { useAuthStore } from '@/features/auth'
 import { authRoutes } from '@/features/auth/routes'
 import { dashboardRoutes } from '@/features/dashboard/routes'
@@ -22,25 +23,10 @@ const router = createRouter({
 
 router.beforeEach(async (to) => {
   const authStore = useAuthStore()
-
-  if (!authStore.authChecked)
-    await authStore.bootstrapAuth()
-
-  if (to.meta.guestOnly && authStore.isAuthenticated)
-    return { name: 'Home' }
-
-  if (to.meta.requiresAuth && !authStore.isAuthenticated) {
-    const query: Record<string, string> = { redirect: to.fullPath }
-    if (authStore.sessionExpiryCode)
-      query.session = authStore.sessionExpiryCode
-    return { name: 'Login', query }
-  }
-
-  if (to.meta.roles?.length) {
-    const hasAnyRole = to.meta.roles.some(role => authStore.hasRole(role))
-    if (!hasAnyRole)
-      return { name: 'Unauthorized' }
-  }
+  const resolved = await resolveAuthRedirect(to, authStore)
+  if (resolved === true)
+    return
+  return resolved
 })
 
 export default router

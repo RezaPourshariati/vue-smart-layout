@@ -18,11 +18,12 @@
     "type-check:back-end": "pnpm --dir back-end type-check",
     "type-check": "run-p type-check:front-end type-check:back-end",
     "test:back-end": "pnpm --dir back-end test",
+    "test:front-end": "pnpm --dir front-end test",
     "lint": "run-p lint:front-end lint:back-end",
-    "lint:front-end": "eslint \"./front-end/src/**/*.{ts,vue}\"",
+    "lint:front-end": "eslint \"./front-end/src/**/*.{ts,vue}\" \"./front-end/tests/**/*.ts\"",
     "lint:back-end": "eslint ./back-end/src ./back-end/tests",
     "lint:fix": "run-p lint:fix:front-end lint:fix:back-end",
-    "lint:fix:front-end": "eslint \"./front-end/src/**/*.{ts,vue}\" --fix",
+    "lint:fix:front-end": "eslint \"./front-end/src/**/*.{ts,vue}\" \"./front-end/tests/**/*.ts\" --fix",
     "lint:fix:back-end": "eslint ./back-end/src ./back-end/tests --fix"
   },
   "devDependencies": {

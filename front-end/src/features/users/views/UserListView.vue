@@ -2,9 +2,9 @@
 import type { UserRole } from '@/types'
 import { onMounted, ref } from 'vue'
 import AuthNotice from '@/components/auth/AuthNotice.vue'
-import { useAuthStore } from '@/features/auth'
+import { useUsersStore } from '@/features/users'
 
-const authStore = useAuthStore()
+const usersStore = useUsersStore()
 const message = ref('')
 const errorMessage = ref('')
 const roleDraft = ref<Record<string, UserRole>>({})
@@ -17,12 +17,12 @@ const roleOptions: { label: string, value: UserRole }[] = [
 ]
 
 function syncRoleDraft() {
-  roleDraft.value = Object.fromEntries(authStore.users.map(user => [user._id, user.role]))
+  roleDraft.value = Object.fromEntries(usersStore.list.map(user => [user._id, user.role]))
 }
 
 onMounted(async () => {
   try {
-    await authStore.getUsers()
+    await usersStore.fetchUsers()
     syncRoleDraft()
   }
   catch (error) {
@@ -34,7 +34,7 @@ async function handleDelete(id: string) {
   message.value = ''
   errorMessage.value = ''
   try {
-    const result = await authStore.deleteUser(id)
+    const result = await usersStore.removeUser(id)
     message.value = result.message
   }
   catch (error) {
@@ -49,7 +49,7 @@ async function handleRoleUpdate(id: string) {
   if (!nextRole)
     return
   try {
-    const result = await authStore.upgradeUser({ id, role: nextRole })
+    const result = await usersStore.upgradeRole({ id, role: nextRole })
     message.value = result.message
   }
   catch (error) {
@@ -77,7 +77,8 @@ async function handleRoleUpdate(id: string) {
     />
 
     <DataTable
-      :value="authStore.users"
+      :value="usersStore.list"
+      :loading="usersStore.loading"
       size="small"
       striped-rows
       show-gridlines
@@ -110,6 +111,7 @@ async function handleRoleUpdate(id: string) {
             option-value="value"
             placeholder="Role"
             class="w-full min-w-40 md:w-56"
+            :disabled="usersStore.loading"
           />
         </template>
       </Column>
@@ -123,12 +125,14 @@ async function handleRoleUpdate(id: string) {
             <Button
               label="Update Role"
               size="small"
+              :disabled="usersStore.loading"
               @click="handleRoleUpdate(data._id)"
             />
             <Button
               label="Delete"
               severity="danger"
               size="small"
+              :disabled="usersStore.loading"
               @click="handleDelete(data._id)"
             />
           </div>

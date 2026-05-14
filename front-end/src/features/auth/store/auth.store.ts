@@ -5,7 +5,6 @@ import type {
   ChangePasswordPayload,
   RegisterPayload,
   UpdateProfilePayload,
-  UpgradeUserPayload,
 } from '@/types'
 import { defineStore } from 'pinia'
 import * as authService from '../api/auth.api'
@@ -13,7 +12,6 @@ import * as authService from '../api/auth.api'
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     user: null as AuthUser | null,
-    users: [] as AuthUser[],
     isAuthenticated: false,
     isLoading: false,
     authChecked: false,
@@ -41,7 +39,6 @@ export const useAuthStore = defineStore('auth', {
     },
     clearAuth() {
       this.user = null
-      this.users = []
       this.isAuthenticated = false
       this.pendingLoginCodeEmail = ''
     },
@@ -200,45 +197,6 @@ export const useAuthStore = defineStore('auth', {
         this.isLoading = false
       }
     },
-    async getUsers() {
-      this.isLoading = true
-      try {
-        const users = await authService.getUsers()
-        this.users = users
-        return users
-      }
-      finally {
-        this.isLoading = false
-      }
-    },
-    async deleteUser(id: string) {
-      this.isLoading = true
-      try {
-        const result = await authService.deleteUser(id)
-        this.users = this.users.filter(user => user._id !== id)
-        return result
-      }
-      finally {
-        this.isLoading = false
-      }
-    },
-    async upgradeUser(payload: UpgradeUserPayload) {
-      this.isLoading = true
-      try {
-        const result = await authService.upgradeUser(payload)
-        this.users = this.users.map((user) => {
-          if (user._id === payload.id)
-            return { ...user, role: payload.role }
-          return user
-        })
-        if (this.user?._id === payload.id)
-          this.user = { ...this.user, role: payload.role }
-        return result
-      }
-      finally {
-        this.isLoading = false
-      }
-    },
     async logout() {
       this.isLoading = true
       try {
@@ -247,6 +205,9 @@ export const useAuthStore = defineStore('auth', {
       finally {
         this.clearAuth()
         this.isLoading = false
+        void import('@/features/users/store/users.store').then(({ useUsersStore }) => {
+          useUsersStore().clearList()
+        })
       }
     },
   },

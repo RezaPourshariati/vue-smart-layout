@@ -18,6 +18,11 @@ How does the SPA restore sessions on load, recover from `401`s, dedupe refresh c
 - Deduplicate concurrent refresh calls in a tab.
 - Surface session-expiry reasons in UI.
 
+## State boundaries (Pinia)
+
+- **`useAuthStore`**: current user, `bootstrapAuth`, login/register/logout, profile and account flows.
+- **`useUsersStore`**: admin/author **user directory** (`list`, `fetchUsers`, `removeUser`, `upgradeRole`). Cleared on logout via a dynamic import from the auth store so session state stays separate from directory cache. The user list view binds **`DataTable :loading`** and disables row actions while **`usersStore.loading`** is true.
+
 ## Key Code Anchors
 
 ### Bootstrap flow
