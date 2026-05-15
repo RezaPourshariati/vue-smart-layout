@@ -16,6 +16,13 @@ function readString(name: string, fallback = ''): string {
 const nodeEnv = readString('NODE_ENV', 'development')
 const isTest = nodeEnv === 'test'
 
+function readBool(name: string, fallback: boolean): boolean {
+  const raw = process.env[name]
+  if (raw === undefined || raw.trim() === '')
+    return fallback
+  return raw.toLowerCase() === 'true' || raw === '1'
+}
+
 export const config = {
   nodeEnv,
   isTest,
@@ -37,6 +44,8 @@ export const config = {
     pass: readString('EMAIL_PASS'),
   },
   devLoginCodeConsoleOnly: readString('DEV_LOGIN_CODE_CONSOLE_ONLY') === 'true',
+  /** Structured JSON auth lines to stdout; default off in test env, on otherwise (see LOG_AUTH_TELEMETRY). */
+  logAuthTelemetry: readBool('LOG_AUTH_TELEMETRY', !isTest),
   session: {
     refreshLifetimeMs: readPositiveMs(process.env.REFRESH_TOKEN_LIFETIME_MS, 1000 * 60 * 60 * 24 * 2),
     idleTimeoutMs: readPositiveMs(process.env.SESSION_IDLE_TIMEOUT_MS, 1000 * 60 * 30),

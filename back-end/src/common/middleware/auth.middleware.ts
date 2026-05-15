@@ -1,12 +1,13 @@
 import type { NextFunction, Response } from 'express'
 import type { AuthJwtPayload, AuthRequest } from '../../types/auth.js'
 import asyncHandler from 'express-async-handler'
-import jwt from 'jsonwebtoken'
+import jwt, { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken'
 import { config } from '../../config/env.js'
 import Session from '../../models/session.model.js'
 import User from '../../models/user.model.js'
 import { getSessionExpiryCode, shouldTouchLastUsed } from '../../services/session-policy.service.js'
 import { ForbiddenError, UnauthorizedError } from '../errors/app-error.js'
+import { emitAuthEvent } from '../observability/auth-events.js'
 
 export const protect = asyncHandler(async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -14,22 +15,49 @@ export const protect = asyncHandler(async (req: AuthRequest, res: Response, next
     const accessSecret = config.jwtSecret
     if (!accessSecret)
       throw new Error('JWT_SECRET is not defined')
-    if (!accessToken)
+    if (!accessToken) {
+      emitAuthEvent(req, 'auth.middleware_denied', { stage: 'access', reason: 'missing_access_cookie' })
       throw new UnauthorizedError('Not authorized, please login')
+    }
 
-    const verified = jwt.verify(accessToken, accessSecret) as AuthJwtPayload
-    if (!verified?.sid)
+    let verified: AuthJwtPayload
+    try {
+      verified = jwt.verify(accessToken, accessSecret) as AuthJwtPayload
+    }
+    catch (e) {
+      const name = e instanceof JsonWebTokenError || e instanceof TokenExpiredError ? e.name : 'JwtError'
+      emitAuthEvent(req, 'auth.middleware_denied', {
+        stage: 'access',
+        reason: 'access_jwt_invalid',
+        jwtError: name,
+      })
       throw new UnauthorizedError('Not authorized, please login')
+    }
+
+    if (!verified?.sid) {
+      emitAuthEvent(req, 'auth.middleware_denied', { stage: 'access', reason: 'missing_session_id_claim' })
+      throw new UnauthorizedError('Not authorized, please login')
+    }
+
     const activeSession = await Session.findOne({
       _id: verified.sid,
       userId: verified.id,
     })
-    if (!activeSession)
+    if (!activeSession) {
+      emitAuthEvent(req, 'auth.middleware_denied', {
+        stage: 'session_lookup',
+        reason: 'session_not_found',
+      })
       throw new UnauthorizedError('Not authorized, please login')
+    }
 
     const sessionExpiryCode = getSessionExpiryCode(activeSession)
     if (sessionExpiryCode) {
       await activeSession.deleteOne()
+      emitAuthEvent(req, 'auth.session_destroyed_idle_or_absolute', {
+        expiryCode: sessionExpiryCode,
+        userId: String(verified.id),
+      })
       res.status(401).json({
         code: sessionExpiryCode,
         message: 'Session expired, please login again',
@@ -56,22 +84,6 @@ export const protect = asyncHandler(async (req: AuthRequest, res: Response, next
       throw error
     throw new UnauthorizedError('Not authorized, please login')
   }
-})
-
-export const adminOnly = asyncHandler(async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
-  if (req.user && req.user.role === 'admin') {
-    next()
-    return
-  }
-  throw new UnauthorizedError('Not authorized as an admin')
-})
-
-export const authorOnly = asyncHandler(async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
-  if (req.user && (req.user.role === 'author' || req.user.role === 'admin')) {
-    next()
-    return
-  }
-  throw new UnauthorizedError('Not authorized as an author')
 })
 
 export const verifiedOnly = asyncHandler(async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {

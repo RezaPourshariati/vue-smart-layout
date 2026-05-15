@@ -17,6 +17,7 @@ import {
   NotFoundError,
   UnauthorizedError,
 } from '../../common/errors/app-error.js'
+import { emitAuthEvent } from '../../common/observability/auth-events.js'
 import sendEmail from '../../common/utils/sendEmail.js'
 import { config } from '../../config/env.js'
 import Session from '../../models/session.model.js'
@@ -112,41 +113,53 @@ export const logoutUser = asyncHandler(async (_req: AuthRequest, res: Response):
 })
 
 export const refreshSession = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
-  const refreshTokenCookie = req.cookies?.refreshToken as string | undefined
-  const refreshSecret = config.jwtRefreshSecret
-  if (!refreshTokenCookie || !refreshSecret)
-    throw new UnauthorizedError('Not authorized, please login')
-
-  let verified: { refreshToken: string, userId: string }
   try {
-    verified = jwt.verify(refreshTokenCookie, refreshSecret) as { refreshToken: string, userId: string }
+    const refreshTokenCookie = req.cookies?.refreshToken as string | undefined
+    const refreshSecret = config.jwtRefreshSecret
+    if (!refreshTokenCookie || !refreshSecret)
+      throw new UnauthorizedError('Not authorized, please login')
+
+    let verified: { refreshToken: string, userId: string }
+    try {
+      verified = jwt.verify(refreshTokenCookie, refreshSecret) as { refreshToken: string, userId: string }
+    }
+    catch {
+      throw new UnauthorizedError('Not authorized, please login')
+    }
+
+    const userToken = await findSessionByRefreshRaw(verified.userId, verified.refreshToken, {
+      requireUnexpiredRolling: true,
+    })
+    if (!userToken)
+      throw new UnauthorizedError('Not authorized, please login')
+    const sessionExpiryCode = getSessionExpiryCode(userToken)
+    if (sessionExpiryCode) {
+      await userToken.deleteOne()
+      throw new UnauthorizedError('Session expired, please login again', sessionExpiryCode)
+    }
+
+    const user = await User.findById(verified.userId)
+    if (!user)
+      throw new UnauthorizedError('Not authorized, please login')
+    if (user.role === 'suspended')
+      throw new ForbiddenError('User suspended, please contact support')
+
+    const { refreshToken: nextRefreshToken, sid } = await rotateExistingSession(userToken, user._id)
+    const accessToken = generateToken(user._id, sid)
+
+    setAuthCookies(res, accessToken, nextRefreshToken)
+    emitAuthEvent(req, 'auth.refresh_success', { userId: String(user._id) })
+    res.status(200).json({ message: 'Session refreshed' })
   }
-  catch {
-    throw new UnauthorizedError('Not authorized, please login')
+  catch (e) {
+    if (e instanceof UnauthorizedError || e instanceof ForbiddenError) {
+      emitAuthEvent(req, 'auth.refresh_failed', {
+        reason: e.message,
+        code: e.code ?? null,
+      })
+    }
+    throw e
   }
-
-  const userToken = await findSessionByRefreshRaw(verified.userId, verified.refreshToken, {
-    requireUnexpiredRolling: true,
-  })
-  if (!userToken)
-    throw new UnauthorizedError('Not authorized, please login')
-  const sessionExpiryCode = getSessionExpiryCode(userToken)
-  if (sessionExpiryCode) {
-    await userToken.deleteOne()
-    throw new UnauthorizedError('Session expired, please login again', sessionExpiryCode)
-  }
-
-  const user = await User.findById(verified.userId)
-  if (!user)
-    throw new UnauthorizedError('Not authorized, please login')
-  if (user.role === 'suspended')
-    throw new ForbiddenError('User suspended, please contact support')
-
-  const { refreshToken: nextRefreshToken, sid } = await rotateExistingSession(userToken, user._id)
-  const accessToken = generateToken(user._id, sid)
-
-  setAuthCookies(res, accessToken, nextRefreshToken)
-  res.status(200).json({ message: 'Session refreshed' })
 })
 
 export const loginStatus = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
@@ -178,6 +191,10 @@ export const loginStatus = asyncHandler(async (req: AuthRequest, res: Response):
   const sessionExpiryCode = getSessionExpiryCode(activeSession)
   if (sessionExpiryCode) {
     await activeSession.deleteOne()
+    emitAuthEvent(req, 'auth.session_destroyed_idle_or_absolute', {
+      expiryCode: sessionExpiryCode,
+      source: 'loginStatus',
+    })
     throw new UnauthorizedError('Session expired, please login again', sessionExpiryCode)
   }
 
