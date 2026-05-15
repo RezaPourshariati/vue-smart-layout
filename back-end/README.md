@@ -15,7 +15,9 @@ Run commands:
 
 API base:
 
-- Canonical API namespace is `/api/auth` (non-versioned).
+- Auth routes: `/api/auth` (login, refresh, logout, password flows).
+- User/profile routes: `/api/users` (me, directory, profile updates).
+- Set `REDIS_URL` in production for distributed rate limiting across instances.
 - Feature routes are organized under `src/features/*` and mounted via `src/app.ts`.
 - Cross-cutting infrastructure lives under `src/common/*` (`middleware`, `errors`, `utils`).
 

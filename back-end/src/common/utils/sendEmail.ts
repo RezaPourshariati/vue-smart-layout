@@ -2,6 +2,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import nodemailer from 'nodemailer'
 import hbs from 'nodemailer-express-handlebars'
+import { config } from '../../config/env.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -22,8 +23,7 @@ const __dirname = path.dirname(__filename)
 
 // Google
 function createMailTransporter() {
-  const port = Number(process.env.EMAIL_PORT || 587)
-  const host = process.env.EMAIL_HOST
+  const { host, port, user, pass } = config.email
   const isGmail = host === 'smtp.gmail.com'
 
   return nodemailer.createTransport({
@@ -33,8 +33,8 @@ function createMailTransporter() {
     secure: port === 465,
     // requireTLS: port === 587,
     auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
+      user,
+      pass,
     },
     // connectionTimeout: 15000,
     // greetingTimeout: 15000,
@@ -44,7 +44,7 @@ function createMailTransporter() {
 
 /** Resolves when the server accepts the connection; throws if SMTP is misconfigured or unreachable. */
 export async function verifyEmailTransport(): Promise<'skipped' | 'ok'> {
-  if (!process.env.EMAIL_HOST || !process.env.EMAIL_USER)
+  if (!config.email.host || !config.email.user)
     return 'skipped'
   const transporter = createMailTransporter()
   await transporter.verify()

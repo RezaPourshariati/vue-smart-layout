@@ -1,4 +1,5 @@
 import type { NextFunction, Request, Response } from 'express'
+import { config } from '../../config/env.js'
 import { AppError } from './app-error.js'
 
 export default function errorHandler(
@@ -16,6 +17,6 @@ export default function errorHandler(
   res.status(statusCode).json({
     ...(code ? { code } : {}),
     message: err.message,
-    stack: process.env.NODE_ENV === 'development' ? err.stack : null,
+    stack: config.isDevelopment ? err.stack : null,
   })
 }

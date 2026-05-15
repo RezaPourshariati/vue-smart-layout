@@ -9,9 +9,10 @@ const sessionSchema = new Schema<ISession>(
       ref: 'User',
       index: true,
     },
-    refreshToken: {
+    refreshTokenHash: {
       type: String,
       required: true,
+      index: true,
     },
     createdAt: {
       type: Date,

@@ -81,7 +81,9 @@ if (sessionExpiryCode) {
 ```ts
 // back-end/src/features/auth/controller.ts
 const verified = jwt.verify(refreshTokenCookie, refreshSecret) as { refreshToken: string, userId: string }
-const userToken = await Session.findOne({ userId: verified.userId, refreshToken: verified.refreshToken, expiresAt: { $gt: Date.now() } })
+const userToken = await findSessionByRefreshRaw(verified.userId, verified.refreshToken, {
+  requireUnexpiredRolling: true,
+})
 
 const { refreshToken: nextRefreshToken, sid } = await rotateExistingSession(userToken, user._id)
 const accessToken = generateToken(user._id, sid)

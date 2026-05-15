@@ -19,16 +19,16 @@ What tokens exist (access vs refresh), how are they represented (JWT + payload),
   - Used for protected API authorization
 - **Refresh token**
   - JWT signed with `JWT_REFRESH_SECRET` (fallback `JWT_SECRET`)
-  - Contains `{ refreshToken, userId }`
+  - Contains `{ refreshToken, userId }` where `refreshToken` is the **raw opaque secret** (client cookie JWT only)
   - Rotated only by `/api/auth/refresh`
 - **Revocation store (sessions)**
-  - MongoDB collection **`sessions`** stores the active refresh secret per session row, rolling expiry, and idle/absolute policy timestamps. Access JWT **`sid`** is the session document **`_id`**.
+  - MongoDB collection **`sessions`** stores **`refreshTokenHash`** (SHA-256 of the raw secret), rolling expiry, and idle/absolute policy timestamps. Access JWT **`sid`** is the session document **`_id`**.
 - **One-time flows (separate collections)**
   - **`email_verification_tokens`**: hashed verify link, TTL ~1h.
   - **`password_reset_tokens`**: hashed reset link, TTL ~1h.
   - **`login_challenges`**: encrypted device login code, TTL ~1h.
 
-The legacy multiplexed **`tokens`** collection is no longer used; existing deployments should run a one-off migration or accept that old rows are ignored until cleaned up.
+The legacy multiplexed **`tokens`** collection is no longer used. Run **`pnpm --dir back-end migrate:tokens`** (optional **`-- --dry-run`**) to copy rows into the new collections and hash refresh secrets, then drop **`tokens`** after verification.
 
 ## Current Cookie Strategy
 
@@ -90,4 +90,4 @@ setAuthCookies(res, accessToken, nextRefreshToken)
 
 1. Add key rotation process with `kid` strategy for JWT secrets.
 2. Add explicit cookie-domain strategy for multi-subdomain deployments.
-3. Add refresh-token hashing at rest in token store.
+3. ~~Add refresh-token hashing at rest in token store.~~ Done (`sessions.refreshTokenHash`).

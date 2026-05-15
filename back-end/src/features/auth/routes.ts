@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { protect } from '../../common/middleware/auth.middleware.js'
-import { createRateLimiter } from '../../common/middleware/rate-limit.middleware.js'
+import { loginRateLimiter } from '../../common/middleware/rate-limit.middleware.js'
 import {
   changePassword,
   forgotPassword,
@@ -18,10 +18,9 @@ import {
 } from './controller.js'
 
 const router = Router()
-const authRateLimiter = createRateLimiter(10, 60 * 1000)
 
 router.post('/register', registerUser)
-router.post('/login', authRateLimiter, loginUser)
+router.post('/login', loginRateLimiter, loginUser)
 router.post('/refresh', refreshSession)
 router.post('/logout', logoutUser)
 router.get('/status', loginStatus)

@@ -1,7 +1,7 @@
 import type { AuthUser, UpgradeUserPayload } from '@/types'
 import { defineStore } from 'pinia'
-import * as authApi from '@/features/auth/api/auth.api'
 import { useAuthStore } from '@/features/auth/store/auth.store'
+import * as usersApi from '@/features/users/api/users.api'
 
 /** Admin / author user-directory operations (separate from session identity in `useAuthStore`). */
 export const useUsersStore = defineStore('users', {
@@ -16,7 +16,7 @@ export const useUsersStore = defineStore('users', {
     async fetchUsers() {
       this.loading = true
       try {
-        const users = await authApi.getUsers()
+        const users = await usersApi.getUsers()
         this.list = users
         return users
       }
@@ -27,7 +27,7 @@ export const useUsersStore = defineStore('users', {
     async removeUser(id: string) {
       this.loading = true
       try {
-        const result = await authApi.deleteUser(id)
+        const result = await usersApi.deleteUser(id)
         this.list = this.list.filter(user => user._id !== id)
         return result
       }
@@ -38,7 +38,7 @@ export const useUsersStore = defineStore('users', {
     async upgradeRole(payload: UpgradeUserPayload) {
       this.loading = true
       try {
-        const result = await authApi.upgradeUser(payload)
+        const result = await usersApi.upgradeUser(payload)
         this.list = this.list.map((user) => {
           if (user._id === payload.id)
             return { ...user, role: payload.role }

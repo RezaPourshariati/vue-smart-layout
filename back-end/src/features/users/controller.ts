@@ -3,6 +3,7 @@ import type { AuthRequest, AutomatedEmailData } from '../../types/auth.js'
 import asyncHandler from 'express-async-handler'
 import { BadRequestError, NotFoundError } from '../../common/errors/app-error.js'
 import sendEmail from '../../common/utils/sendEmail.js'
+import { config } from '../../config/env.js'
 import User from '../../models/user.model.js'
 
 export const getUser = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
@@ -54,8 +55,8 @@ export const sendAutomatedEmail = asyncHandler(async (req: AuthRequest, res: Res
   const user = await User.findOne({ email: send_to })
   if (!user)
     throw new NotFoundError('User not found')
-  const sent_from = process.env.EMAIL_USER || ''
-  const link = `${process.env.FRONTEND_URL || 'http://localhost:5173'}${url || ''}`
+  const sent_from = config.email.user
+  const link = `${config.frontendUrl}${url || ''}`
   await sendEmail(subject, send_to, sent_from, reply_to, template, user.name, link)
   res.status(200).json({ message: 'Email Sent' })
 })

@@ -1,10 +1,11 @@
 import type { Response } from 'express'
 import crypto from 'node:crypto'
+import { config } from '../config/env.js'
 import { getRefreshLifetimeMs } from './session-policy.service.js'
 
 /** Supertest uses HTTP; browsers require `Secure` for `SameSite=None`. Use lax + non-secure in `NODE_ENV=test`. */
 function cookieFlags(): { secure: boolean, sameSite: 'lax' | 'none' } {
-  if (process.env.NODE_ENV === 'test')
+  if (config.isTest)
     return { secure: false, sameSite: 'lax' }
   return { secure: true, sameSite: 'none' }
 }

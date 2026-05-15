@@ -3,7 +3,7 @@ import type { ISession } from '../types/auth.js'
 import crypto from 'node:crypto'
 import Session from '../models/session.model.js'
 import { buildSessionTimestamps } from './session-policy.service.js'
-import { generateRefreshToken, generateToken } from './token.service.js'
+import { generateRefreshToken, generateToken, hashRefreshToken } from './token.service.js'
 
 type SessionUserId = Types.ObjectId | string
 
@@ -18,7 +18,7 @@ export async function replaceUserSession(userId: SessionUserId, refreshTokenRaw:
   const sessionTimestamps = buildSessionTimestamps()
   const createdSession = await new Session({
     userId,
-    refreshToken: refreshTokenRaw,
+    refreshTokenHash: hashRefreshToken(refreshTokenRaw),
     createdAt: sessionTimestamps.createdAt,
     expiresAt: sessionTimestamps.expiresAt,
     lastUsedAt: sessionTimestamps.lastUsedAt,
@@ -34,7 +34,7 @@ export async function rotateExistingSession(
   const refreshTokenRaw = crypto.randomBytes(32).toString('hex') + userId
   const refreshToken = generateRefreshToken({ refreshToken: refreshTokenRaw, userId })
 
-  sessionDoc.refreshToken = refreshTokenRaw
+  sessionDoc.refreshTokenHash = hashRefreshToken(refreshTokenRaw)
   const nextSession = buildSessionTimestamps(sessionDoc.sessionStartedAt)
   sessionDoc.createdAt = nextSession.createdAt
   sessionDoc.lastUsedAt = nextSession.lastUsedAt
@@ -52,4 +52,18 @@ export async function createFreshSessionTokens(
   const sid = await replaceUserSession(userId, refreshTokenRaw)
   const accessToken = generateToken(userId, sid)
   return { accessToken, refreshToken, sid }
+}
+
+export async function findSessionByRefreshRaw(
+  userId: SessionUserId,
+  refreshTokenRaw: string,
+  options?: { requireUnexpiredRolling?: boolean },
+): Promise<ISession | null> {
+  const query: Record<string, unknown> = {
+    userId,
+    refreshTokenHash: hashRefreshToken(refreshTokenRaw),
+  }
+  if (options?.requireUnexpiredRolling)
+    query.expiresAt = { $gt: Date.now() }
+  return Session.findOne(query)
 }

@@ -1,22 +1,13 @@
 import mongoose from 'mongoose'
 import app from './app.js'
 import { verifyEmailTransport } from './common/utils/sendEmail.js'
+import { assertConfigValid, config, warnIfRateLimitNotDistributed } from './config/env.js'
 import {
   getRefreshLifetimeMs,
   getSessionAbsoluteTimeoutMs,
   getSessionIdleTimeoutMs,
   getSessionLastUsedTouchIntervalMs,
 } from './services/session-policy.service.js'
-import 'dotenv/config'
-
-const port = Number(process.env.PORT || 4000)
-
-function readPositiveMs(value: string | undefined, fallback: number): number {
-  const parsed = Number(value)
-  if (!Number.isFinite(parsed) || parsed <= 0)
-    return fallback
-  return parsed
-}
 
 function warnOnSessionPolicyMisconfiguration(): void {
   const refreshLifetimeMs = getRefreshLifetimeMs()
@@ -46,19 +37,16 @@ function warnOnSessionPolicyMisconfiguration(): void {
 
 async function start() {
   try {
-    const mongoUri = process.env.MONGO_URI
-    // console.log(mongoUri)
-    if (!mongoUri)
-      throw new Error('MONGO_URI is not defined')
-    await mongoose.connect(mongoUri)
-    console.log('Database Connected Successfully.')
-
-    // Trigger env parsing early and log non-fatal policy sanity warnings.
-    readPositiveMs(process.env.SESSION_IDLE_TIMEOUT_MS, 1000 * 60 * 30)
-    readPositiveMs(process.env.SESSION_LAST_USED_TOUCH_INTERVAL_MS, 1000 * 30)
+    assertConfigValid()
+    warnIfRateLimitNotDistributed()
     warnOnSessionPolicyMisconfiguration()
 
-    if (process.env.NODE_ENV === 'development') {
+    if (!config.mongoUri)
+      throw new Error('MONGO_URI is not defined')
+    await mongoose.connect(config.mongoUri)
+    console.log('Database Connected Successfully.')
+
+    if (config.isDevelopment) {
       verifyEmailTransport().then((result) => {
         if (result === 'ok')
           console.log('[adaptive-auth] SMTP verify: connection OK')
@@ -67,8 +55,8 @@ async function start() {
       })
     }
 
-    app.listen(port, () => {
-      console.log(`Auth server running on http://localhost:${port}`)
+    app.listen(config.port, () => {
+      console.log(`Auth server running on http://localhost:${config.port}`)
     })
   }
   catch (error) {

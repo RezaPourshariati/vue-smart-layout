@@ -1,30 +1,48 @@
 import type { NextFunction, Request, Response } from 'express'
+import type { RateLimiterAbstract } from 'rate-limiter-flexible'
+import { Redis } from 'ioredis'
+import { RateLimiterMemory, RateLimiterRedis } from 'rate-limiter-flexible'
+import { config } from '../../config/env.js'
 
-interface Bucket {
-  count: number
-  resetAt: number
+const LOGIN_LIMIT = { points: 10, duration: 60 }
+
+let loginLimiter: RateLimiterAbstract | null = null
+let loginLimiterInit: Promise<RateLimiterAbstract> | null = null
+
+async function buildLoginLimiter(): Promise<RateLimiterAbstract> {
+  if (config.redisUrl) {
+    const client = new Redis(config.redisUrl)
+    return new RateLimiterRedis({
+      storeClient: client,
+      points: LOGIN_LIMIT.points,
+      duration: LOGIN_LIMIT.duration,
+    })
+  }
+  return new RateLimiterMemory({
+    points: LOGIN_LIMIT.points,
+    duration: LOGIN_LIMIT.duration,
+  })
 }
 
-const buckets = new Map<string, Bucket>()
+async function getLoginLimiter(): Promise<RateLimiterAbstract> {
+  if (loginLimiter)
+    return loginLimiter
+  if (!loginLimiterInit)
+    loginLimiterInit = buildLoginLimiter()
+  loginLimiter = await loginLimiterInit
+  return loginLimiter
+}
 
-export function createRateLimiter(maxRequests: number, windowMs: number) {
+export function createRateLimiter(limiterPromise: () => Promise<RateLimiterAbstract>) {
   return (req: Request, res: Response, next: NextFunction): void => {
     const key = `${req.ip}:${req.path}`
-    const now = Date.now()
-    const existing = buckets.get(key)
-
-    if (!existing || existing.resetAt <= now) {
-      buckets.set(key, { count: 1, resetAt: now + windowMs })
-      next()
-      return
-    }
-
-    if (existing.count >= maxRequests) {
-      res.status(429).json({ message: 'Too many requests, please try again later.' })
-      return
-    }
-
-    existing.count += 1
-    next()
+    void limiterPromise()
+      .then(limiter => limiter.consume(key))
+      .then(() => next())
+      .catch(() => {
+        res.status(429).json({ message: 'Too many requests, please try again later.' })
+      })
   }
 }
+
+export const loginRateLimiter = createRateLimiter(getLoginLimiter)

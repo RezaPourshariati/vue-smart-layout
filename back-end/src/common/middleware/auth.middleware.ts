@@ -2,6 +2,7 @@ import type { NextFunction, Response } from 'express'
 import type { AuthJwtPayload, AuthRequest } from '../../types/auth.js'
 import asyncHandler from 'express-async-handler'
 import jwt from 'jsonwebtoken'
+import { config } from '../../config/env.js'
 import Session from '../../models/session.model.js'
 import User from '../../models/user.model.js'
 import { getSessionExpiryCode, shouldTouchLastUsed } from '../../services/session-policy.service.js'
@@ -10,7 +11,7 @@ import { ForbiddenError, UnauthorizedError } from '../errors/app-error.js'
 export const protect = asyncHandler(async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { accessToken } = req.cookies as { accessToken?: string }
-    const accessSecret = process.env.JWT_SECRET
+    const accessSecret = config.jwtSecret
     if (!accessSecret)
       throw new Error('JWT_SECRET is not defined')
     if (!accessToken)

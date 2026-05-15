@@ -180,7 +180,7 @@ describe('auth integration', () => {
     expect(reg.status).toBe(201)
 
     const blocked = await agent
-      .patch('/api/auth/updateUser')
+      .patch('/api/users/updateUser')
       .send({ name: 'Updated Name' })
     expect(blocked.status).toBe(403)
     expect(blocked.body.message).toBe('Invalid CSRF token')
@@ -199,7 +199,7 @@ describe('auth integration', () => {
     expect(csrf).toBeTruthy()
 
     const ok = await agent
-      .patch('/api/auth/updateUser')
+      .patch('/api/users/updateUser')
       .set('x-csrf-token', csrf!)
       .send({ name: 'Updated Name' })
     expect(ok.status).toBe(200)

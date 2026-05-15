@@ -18,11 +18,13 @@ import {
   UnauthorizedError,
 } from '../../common/errors/app-error.js'
 import sendEmail from '../../common/utils/sendEmail.js'
+import { config } from '../../config/env.js'
 import Session from '../../models/session.model.js'
 import User from '../../models/user.model.js'
 import { clearAuthCookies, setAuthCookies } from '../../services/auth-cookie.service.js'
 import {
   createFreshSessionTokens,
+  findSessionByRefreshRaw,
   rotateExistingSession,
 } from '../../services/auth-session.service.js'
 import {
@@ -37,10 +39,9 @@ import { getSessionExpiryCode } from '../../services/session-policy.service.js'
 import { generateToken, hashToken } from '../../services/token.service.js'
 
 function getCryptr(): Cryptr {
-  const key = process.env.CRYPTR_KEY
-  if (!key)
+  if (!config.cryptrKey)
     throw new Error('CRYPTR_KEY is not defined')
-  return new Cryptr(key)
+  return new Cryptr(config.cryptrKey)
 }
 
 export const registerUser = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
@@ -91,16 +92,15 @@ export const loginUser = asyncHandler(async (req: AuthRequest, res: Response): P
 })
 
 export const logoutUser = asyncHandler(async (_req: AuthRequest, res: Response): Promise<void> => {
-  const refreshSecret = process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET
+  const refreshSecret = config.jwtRefreshSecret
   const refreshTokenCookie = _req.cookies?.refreshToken as string | undefined
 
   if (refreshTokenCookie && refreshSecret) {
     try {
       const verified = jwt.verify(refreshTokenCookie, refreshSecret) as { refreshToken: string, userId: string }
-      await Session.findOneAndDelete({
-        userId: verified.userId,
-        refreshToken: verified.refreshToken,
-      })
+      const session = await findSessionByRefreshRaw(verified.userId, verified.refreshToken)
+      if (session)
+        await session.deleteOne()
     }
     catch {
       // Best-effort cleanup: always clear cookies even if token is invalid/expired.
@@ -113,7 +113,7 @@ export const logoutUser = asyncHandler(async (_req: AuthRequest, res: Response):
 
 export const refreshSession = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
   const refreshTokenCookie = req.cookies?.refreshToken as string | undefined
-  const refreshSecret = process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET
+  const refreshSecret = config.jwtRefreshSecret
   if (!refreshTokenCookie || !refreshSecret)
     throw new UnauthorizedError('Not authorized, please login')
 
@@ -125,10 +125,8 @@ export const refreshSession = asyncHandler(async (req: AuthRequest, res: Respons
     throw new UnauthorizedError('Not authorized, please login')
   }
 
-  const userToken = await Session.findOne({
-    userId: verified.userId,
-    refreshToken: verified.refreshToken,
-    expiresAt: { $gt: Date.now() },
+  const userToken = await findSessionByRefreshRaw(verified.userId, verified.refreshToken, {
+    requireUnexpiredRolling: true,
   })
   if (!userToken)
     throw new UnauthorizedError('Not authorized, please login')
@@ -157,7 +155,7 @@ export const loginStatus = asyncHandler(async (req: AuthRequest, res: Response):
     res.json(false)
     return
   }
-  const secret = process.env.JWT_SECRET
+  const secret = config.jwtSecret
   if (!secret) {
     res.json(false)
     return
@@ -194,16 +192,18 @@ export const sendVerificationEmail = asyncHandler(async (req: AuthRequest, res: 
     throw new BadRequestError('User already verified')
 
   const verificationToken = crypto.randomBytes(32).toString('hex') + user._id
-  console.log(verificationToken)
   const hashedToken = hashToken(verificationToken)
-  console.log('--->', hashedToken)
+  if (config.isDevelopment) {
+    console.log(`[adaptive-auth] Verification token for ${user.email}: ${verificationToken}`)
+    console.log(`[adaptive-auth] Hashed token for ${user.email}: ${hashedToken}`)
+  }
   await replaceWithVerificationRecord(user._id, hashedToken)
 
-  const verificationUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/verify/${verificationToken}`
+  const verificationUrl = `${config.frontendUrl}/verify/${verificationToken}`
   await sendEmail(
     'Verify Your Account - AdaptiveAuth',
     user.email,
-    process.env.EMAIL_USER || '',
+    config.email.user,
     'noreply@adaptive-auth.local',
     'verifyEmail',
     user.name,
@@ -236,11 +236,11 @@ export const forgotPassword = asyncHandler(async (req: AuthRequest, res: Respons
   const resetToken = crypto.randomBytes(32).toString('hex') + user._id
   const hashedToken = hashToken(resetToken)
   await replaceWithResetRecord(user._id, hashedToken)
-  const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password/${resetToken}`
+  const resetUrl = `${config.frontendUrl}/reset-password/${resetToken}`
   await sendEmail(
     'Password Reset Request - AdaptiveAuth',
     user.email,
-    process.env.EMAIL_USER || '',
+    config.email.user,
     'noreply@adaptive-auth.local',
     'forgotPassword',
     user.name,
@@ -288,13 +288,13 @@ export const sendLoginCode = asyncHandler(async (req: AuthRequest, res: Response
     throw new UnauthorizedError('Invalid or Expired Token, please login again')
   const decryptedLoginCode = getCryptr().decrypt(userToken.encryptedLoginCode)
 
-  if (process.env.NODE_ENV === 'development')
+  if (config.isDevelopment)
     console.log(`[adaptive-auth] Login code for ${email}: ${decryptedLoginCode}`)
 
   await sendEmail(
     'Login Access Code - AdaptiveAuth',
     email,
-    process.env.EMAIL_USER || '',
+    config.email.user,
     'noreply@adaptive-auth.local',
     'loginCode',
     user.name,
@@ -325,7 +325,7 @@ export const loginWithCode = asyncHandler(async (req: AuthRequest, res: Response
 
 export const loginWithGoogle = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
   const { userToken } = req.body as { userToken: string }
-  const clientId = process.env.GOOGLE_CLIENT_ID
+  const clientId = config.googleClientId
   if (!clientId)
     throw new Error('GOOGLE_CLIENT_ID is not defined')
   const client = new OAuth2Client(clientId)

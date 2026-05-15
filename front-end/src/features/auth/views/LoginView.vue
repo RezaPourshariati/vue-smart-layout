@@ -92,9 +92,9 @@ async function handleLogin() {
       <button
         type="submit"
         class="rounded bg-slate-900 px-4 py-2 text-white disabled:opacity-60"
-        :disabled="authStore.isLoading"
+        :disabled="authStore.isSessionLoading"
       >
-        {{ authStore.isLoading ? 'Signing in...' : 'Sign in' }}
+        {{ authStore.isSessionLoading ? 'Signing in...' : 'Sign in' }}
       </button>
     </form>
 

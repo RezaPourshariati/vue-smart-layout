@@ -1,41 +1,26 @@
 import type { ISession } from '../types/auth.js'
+import { config } from '../config/env.js'
 
-const DEFAULT_REFRESH_LIFETIME_MS = 1000 * 60 * 60 * 24 * 2 // 2d
-const DEFAULT_IDLE_TIMEOUT_MS = 1000 * 60 * 30 // 30m
-const DEFAULT_ABSOLUTE_TIMEOUT_MS = 1000 * 60 * 60 * 24 * 30 // 30d
-const DEFAULT_LAST_USED_TOUCH_INTERVAL_MS = 1000 * 30 // 30s
 export type SessionExpiryCode = 'SESSION_IDLE_EXPIRED' | 'SESSION_ABSOLUTE_EXPIRED'
 
-function readMsEnv(name: string, fallback: number): number {
-  const raw = process.env[name]
-  if (!raw)
-    return fallback
-  const parsed = Number(raw)
-  if (!Number.isFinite(parsed) || parsed <= 0)
-    return fallback
-  return parsed
-}
-
 export function getRefreshLifetimeMs(): number {
-  return readMsEnv('REFRESH_TOKEN_LIFETIME_MS', DEFAULT_REFRESH_LIFETIME_MS)
+  return config.session.refreshLifetimeMs
 }
 
 export function getRefreshLifetimeSeconds(): number {
-  // jsonwebtoken accepts integer seconds for numeric expiresIn values.
   return Math.max(1, Math.floor(getRefreshLifetimeMs() / 1000))
 }
 
 export function getSessionIdleTimeoutMs(): number {
-  return readMsEnv('SESSION_IDLE_TIMEOUT_MS', DEFAULT_IDLE_TIMEOUT_MS)
+  return config.session.idleTimeoutMs
 }
 
 export function getSessionAbsoluteTimeoutMs(): number {
-  return readMsEnv('SESSION_ABSOLUTE_TIMEOUT_MS', DEFAULT_ABSOLUTE_TIMEOUT_MS)
+  return config.session.absoluteTimeoutMs
 }
 
 export function getSessionLastUsedTouchIntervalMs(): number {
-  const interval = readMsEnv('SESSION_LAST_USED_TOUCH_INTERVAL_MS', DEFAULT_LAST_USED_TOUCH_INTERVAL_MS)
-  // Ensure touch interval never exceeds idle timeout; otherwise active sessions could still expire.
+  const interval = config.session.lastUsedTouchIntervalMs
   return Math.min(interval, getSessionIdleTimeoutMs())
 }
 

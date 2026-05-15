@@ -7,13 +7,16 @@ import type {
   UpdateProfilePayload,
 } from '@/types'
 import { defineStore } from 'pinia'
+import * as usersService from '@/features/users/api/users.api'
 import * as authService from '../api/auth.api'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     user: null as AuthUser | null,
     isAuthenticated: false,
-    isLoading: false,
+    bootstrapLoading: false,
+    sessionLoading: false,
+    accountLoading: false,
     authChecked: false,
     pendingLoginCodeEmail: '' as string,
     sessionExpiryCode: null as AuthApiErrorCode | null,
@@ -21,6 +24,13 @@ export const useAuthStore = defineStore('auth', {
   getters: {
     roles: state => (state.user?.role ? [state.user.role] : []),
     hasRole: state => (role: string) => state.user?.role === role,
+    /** True while any auth operation is in flight (avoid for form buttons — use scoped flags). */
+    isLoading(state): boolean {
+      return state.bootstrapLoading || state.sessionLoading || state.accountLoading
+    },
+    isBootstrapLoading: state => state.bootstrapLoading,
+    isSessionLoading: state => state.sessionLoading,
+    isAccountLoading: state => state.accountLoading,
     sessionExpiryMessage(state): string {
       if (state.sessionExpiryCode === 'SESSION_IDLE_EXPIRED')
         return 'You were inactive for too long. Please log in again.'
@@ -52,12 +62,11 @@ export const useAuthStore = defineStore('auth', {
       if (this.authChecked)
         return
 
-      this.isLoading = true
+      this.bootstrapLoading = true
       try {
-        // Proactively refresh first to restore session when only refresh cookie is still valid.
         try {
           await authService.refreshSession()
-          const refreshedUser = await authService.getCurrentUser()
+          const refreshedUser = await usersService.getCurrentUser()
           this.setUser(refreshedUser)
           this.clearSessionExpiryCode()
           return
@@ -69,12 +78,11 @@ export const useAuthStore = defineStore('auth', {
             this.clearAuth()
             return
           }
-          // Fall through to status/access-token checks (access token might still be valid).
         }
 
         const isLoggedIn = await authService.getLoginStatus()
         if (isLoggedIn) {
-          const user = await authService.getCurrentUser()
+          const user = await usersService.getCurrentUser()
           this.setUser(user)
           this.clearSessionExpiryCode()
         }
@@ -87,11 +95,11 @@ export const useAuthStore = defineStore('auth', {
       }
       finally {
         this.authChecked = true
-        this.isLoading = false
+        this.bootstrapLoading = false
       }
     },
     async login(credentials: AuthCredentials) {
-      this.isLoading = true
+      this.sessionLoading = true
       try {
         const user = await authService.login(credentials)
         this.setUser(user)
@@ -106,31 +114,31 @@ export const useAuthStore = defineStore('auth', {
         throw error
       }
       finally {
-        this.isLoading = false
+        this.sessionLoading = false
       }
     },
     async register(payload: RegisterPayload) {
-      this.isLoading = true
+      this.sessionLoading = true
       try {
         const user = await authService.register(payload)
         this.setUser(user)
         this.clearSessionExpiryCode()
       }
       finally {
-        this.isLoading = false
+        this.sessionLoading = false
       }
     },
     async sendLoginCode(email: string) {
-      this.isLoading = true
+      this.sessionLoading = true
       try {
         await authService.sendLoginCode(email)
       }
       finally {
-        this.isLoading = false
+        this.sessionLoading = false
       }
     },
     async loginWithCode(email: string, loginCode: string) {
-      this.isLoading = true
+      this.sessionLoading = true
       try {
         const user = await authService.loginWithCode(email, loginCode)
         this.setUser(user)
@@ -138,73 +146,73 @@ export const useAuthStore = defineStore('auth', {
         this.pendingLoginCodeEmail = ''
       }
       finally {
-        this.isLoading = false
+        this.sessionLoading = false
       }
     },
     async forgotPassword(email: string) {
-      this.isLoading = true
+      this.accountLoading = true
       try {
         return await authService.forgotPassword(email)
       }
       finally {
-        this.isLoading = false
+        this.accountLoading = false
       }
     },
     async resetPassword(resetToken: string, password: string) {
-      this.isLoading = true
+      this.accountLoading = true
       try {
         return await authService.resetPassword(resetToken, password)
       }
       finally {
-        this.isLoading = false
+        this.accountLoading = false
       }
     },
     async updateUser(payload: UpdateProfilePayload) {
-      this.isLoading = true
+      this.accountLoading = true
       try {
-        const user = await authService.updateUser(payload)
+        const user = await usersService.updateUser(payload)
         this.setUser(user)
         return user
       }
       finally {
-        this.isLoading = false
+        this.accountLoading = false
       }
     },
     async sendVerificationEmail() {
-      this.isLoading = true
+      this.accountLoading = true
       try {
         return await authService.sendVerificationEmail()
       }
       finally {
-        this.isLoading = false
+        this.accountLoading = false
       }
     },
     async verifyUser(verificationToken: string) {
-      this.isLoading = true
+      this.accountLoading = true
       try {
         return await authService.verifyUser(verificationToken)
       }
       finally {
-        this.isLoading = false
+        this.accountLoading = false
       }
     },
     async changePassword(payload: ChangePasswordPayload) {
-      this.isLoading = true
+      this.accountLoading = true
       try {
         return await authService.changePassword(payload)
       }
       finally {
-        this.isLoading = false
+        this.accountLoading = false
       }
     },
     async logout() {
-      this.isLoading = true
+      this.sessionLoading = true
       try {
         await authService.logout()
       }
       finally {
         this.clearAuth()
-        this.isLoading = false
+        this.sessionLoading = false
         void import('@/features/users/store/users.store').then(({ useUsersStore }) => {
           useUsersStore().clearList()
         })

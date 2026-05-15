@@ -4,14 +4,12 @@ import cors from 'cors'
 import express from 'express'
 import errorHandler from './common/errors/error.middleware.js'
 import { requireCsrf } from './common/middleware/csrf.middleware.js'
+import { config } from './config/env.js'
 import { authRoutes } from './features/auth/index.js'
 import { userRoutes } from './features/users/index.js'
 
 const app = express()
-const allowedOrigins = [
-  process.env.CLIENT_URL || 'http://localhost:5173',
-  process.env.FRONTEND_URL || 'http://localhost:5173',
-]
+const allowedOrigins = [config.clientUrl, config.frontendUrl]
 
 app.use(cors({
   origin: allowedOrigins,
@@ -28,7 +26,8 @@ app.get('/api/health', (_req, res) => {
 
 app.use('/api/auth', requireCsrf)
 app.use('/api/auth', authRoutes)
-app.use('/api/auth', userRoutes)
+app.use('/api/users', requireCsrf)
+app.use('/api/users', userRoutes)
 app.use(errorHandler)
 
 export default app

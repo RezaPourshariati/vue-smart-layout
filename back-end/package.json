@@ -9,6 +9,7 @@
     "type-check": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
+    "migrate:tokens": "tsx scripts/migrate-legacy-tokens.ts",
     "start": "node dist/server.js"
   },
   "dependencies": {
@@ -21,10 +22,12 @@
     "express": "^5.2.1",
     "express-async-handler": "^1.2.0",
     "google-auth-library": "^10.6.2",
+    "ioredis": "^5.10.1",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.5.0",
     "nodemailer": "^8.0.6",
     "nodemailer-express-handlebars": "^7.0.0",
+    "rate-limiter-flexible": "^11.1.0",
     "ua-parser-js": "^2.0.6"
   },
   "devDependencies": {

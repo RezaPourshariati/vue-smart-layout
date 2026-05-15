@@ -21,7 +21,8 @@ export interface IUser extends Document {
 export interface ISession extends Document {
   _id: Types.ObjectId
   userId: Types.ObjectId
-  refreshToken: string
+  /** SHA-256 hex of the opaque refresh secret (JWT still carries the raw value). */
+  refreshTokenHash: string
   createdAt: Date
   expiresAt: Date
   sessionStartedAt: Date

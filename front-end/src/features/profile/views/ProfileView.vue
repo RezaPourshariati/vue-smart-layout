@@ -122,7 +122,7 @@ async function handleLogout() {
           <button
             type="submit"
             class="rounded bg-emerald-600 px-4 py-2 text-white disabled:opacity-60"
-            :disabled="authStore.isLoading"
+            :disabled="authStore.isAccountLoading"
           >
             Save Profile
           </button>

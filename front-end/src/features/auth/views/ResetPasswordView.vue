@@ -48,9 +48,9 @@ async function handleSubmit() {
       <button
         type="submit"
         class="rounded bg-slate-900 px-4 py-2 text-white disabled:opacity-60"
-        :disabled="authStore.isLoading"
+        :disabled="authStore.isAccountLoading"
       >
-        {{ authStore.isLoading ? 'Updating...' : 'Update Password' }}
+        {{ authStore.isAccountLoading ? 'Updating...' : 'Update Password' }}
       </button>
     </form>
     <AuthNotice
