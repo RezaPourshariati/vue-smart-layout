@@ -1,13 +1,13 @@
 {
   "references": [
     {
-      "path": "./front-end/tsconfig.app.json"
+      "path": "./apps/vue-app/tsconfig.app.json"
     },
     {
-      "path": "./front-end/tsconfig.node.json"
+      "path": "./apps/vue-app/tsconfig.node.json"
     },
     {
-      "path": "./back-end/tsconfig.json"
+      "path": "./services/auth-server/tsconfig.json"
     }
   ],
   "files": []

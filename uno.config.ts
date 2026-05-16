@@ -1,2 +1,2 @@
-// we don't need to import it in the server
-export { default } from './front-end/uno.config'
+// Re-export UnoCSS config from the Vue app for root-level tooling (e.g. ESLint).
+export { default } from './apps/vue-app/uno.config'

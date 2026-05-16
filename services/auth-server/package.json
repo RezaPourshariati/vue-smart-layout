@@ -1,5 +1,5 @@
 {
-  "name": "adaptive-auth-back-end",
+  "name": "@adaptive-auth/auth-server",
   "type": "module",
   "version": "0.1.0",
   "private": true,

@@ -1,14 +1,15 @@
 # AdaptiveAuth
 
-AdaptiveAuth is a full-stack adaptive authentication starter organized as a pnpm workspace with separate front-end and back-end packages.
+AdaptiveAuth is a full-stack adaptive authentication starter organized as a pnpm monorepo.
 
-> This repository was previously named **`vue-smart-layout`**. Current package and product name: **AdaptiveAuth** (repo **`adaptive-auth`**).
+> **Local folder** may still be named `vue-smart-layout` (Cursor workspace). The **git remote** and product name are **AdaptiveAuth** (`adaptive-auth`).
 
-## Project Structure
+## Project structure
 
-- `front-end`: Vue + Vite application
-- `back-end`: Express + TypeScript API
-- root: workspace orchestration, shared lint config, CI workflows
+- `apps/vue-app` — Vue + Vite SPA
+- `services/auth-server` — Express + TypeScript API
+- `packages/` — shared libraries (Phase B+)
+- root — workspace orchestration, shared lint/TS config, CI
 
 ## Prerequisites
 
@@ -23,13 +24,13 @@ pnpm install
 
 ## Development
 
-Run front-end only:
+Run the Vue app only:
 
 ```sh
 pnpm dev
 ```
 
-Run both front-end and back-end:
+Run Vue app and auth server:
 
 ```sh
 pnpm dev:full
@@ -38,40 +39,33 @@ pnpm dev:full
 Run packages independently:
 
 ```sh
-pnpm dev:front-end
-pnpm dev:back-end
+pnpm dev:vue-app
+pnpm dev:auth-server
 ```
 
-## Quality Checks
+Legacy script aliases `dev:front-end` and `dev:back-end` still work.
 
-Lint both packages:
+## Quality checks
 
 ```sh
 pnpm lint
-```
-
-Type-check both packages:
-
-```sh
 pnpm type-check
+pnpm test:vue-app
+pnpm test:auth-server
+pnpm test:e2e
 ```
 
 ## Build
 
-Build front-end:
-
 ```sh
-pnpm build:front-end
-```
-
-Build back-end:
-
-```sh
-pnpm build:back-end
-```
-
-Build all (type-check + front-end build):
-
-```sh
+pnpm build:vue-app
+pnpm build:auth-server
 pnpm build
 ```
+
+## Environment
+
+- Copy `apps/vue-app/.env.example` → `apps/vue-app/.env`
+- Copy `services/auth-server/.env.example` → `services/auth-server/.env`
+
+If you had `.env` files under the old `front-end/` or `back-end/` paths, move them to the locations above.

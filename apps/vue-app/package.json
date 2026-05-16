@@ -1,5 +1,5 @@
 {
-  "name": "adaptive-auth-front-end",
+  "name": "@adaptive-auth/vue-app",
   "type": "module",
   "version": "0.1.0",
   "private": true,
