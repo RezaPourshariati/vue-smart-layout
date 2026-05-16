@@ -6,6 +6,7 @@ export type AuthTelemetryEvent
     | 'auth.refresh_failed'
     | 'auth.middleware_denied'
     | 'auth.session_destroyed_idle_or_absolute'
+    | 'auth.sessions_revoked'
 
 function basePayload(req: Request) {
   return {

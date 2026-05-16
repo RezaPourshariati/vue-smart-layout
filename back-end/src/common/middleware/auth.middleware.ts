@@ -1,12 +1,13 @@
 import type { NextFunction, Response } from 'express'
 import type { AuthJwtPayload, AuthRequest } from '../../types/auth.js'
 import asyncHandler from 'express-async-handler'
-import jwt, { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken'
+import jwt from 'jsonwebtoken'
 import { config } from '../../config/env.js'
 import Session from '../../models/session.model.js'
 import User from '../../models/user.model.js'
 import { getSessionExpiryCode, shouldTouchLastUsed } from '../../services/session-policy.service.js'
-import { ForbiddenError, UnauthorizedError } from '../errors/app-error.js'
+import { assertUserNotSuspended } from '../../services/user-policy.service.js'
+import { UnauthorizedError } from '../errors/app-error.js'
 import { emitAuthEvent } from '../observability/auth-events.js'
 
 export const protect = asyncHandler(async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
@@ -25,7 +26,7 @@ export const protect = asyncHandler(async (req: AuthRequest, res: Response, next
       verified = jwt.verify(accessToken, accessSecret) as AuthJwtPayload
     }
     catch (e) {
-      const name = e instanceof JsonWebTokenError || e instanceof TokenExpiredError ? e.name : 'JwtError'
+      const name = e instanceof Error ? e.name : 'JwtError'
       emitAuthEvent(req, 'auth.middleware_denied', {
         stage: 'access',
         reason: 'access_jwt_invalid',
@@ -72,8 +73,7 @@ export const protect = asyncHandler(async (req: AuthRequest, res: Response, next
     const user = await User.findById(verified.id).select('-password')
     if (!user)
       throw new UnauthorizedError('Not authorized, please login')
-    if (user.role === 'suspended')
-      throw new ForbiddenError('User suspended, please contact support')
+    assertUserNotSuspended(user)
     req.user = user
     next()
   }

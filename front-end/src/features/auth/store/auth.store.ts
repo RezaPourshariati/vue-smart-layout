@@ -36,6 +36,8 @@ export const useAuthStore = defineStore('auth', {
         return 'You were inactive for too long. Please log in again.'
       if (state.sessionExpiryCode === 'SESSION_ABSOLUTE_EXPIRED')
         return 'Your maximum session time has ended. Please log in again.'
+      if (state.sessionExpiryCode === 'ACCOUNT_SUSPENDED')
+        return 'Your account has been suspended. Please contact support.'
       return ''
     },
     isAdmin(): boolean {
@@ -78,6 +80,11 @@ export const useAuthStore = defineStore('auth', {
             this.clearAuth()
             return
           }
+          if (authError?.message?.includes('suspended')) {
+            this.setSessionExpiryCode('ACCOUNT_SUSPENDED')
+            this.clearAuth()
+            return
+          }
         }
 
         const isLoggedIn = await authService.getLoginStatus()
@@ -107,6 +114,11 @@ export const useAuthStore = defineStore('auth', {
         this.pendingLoginCodeEmail = ''
       }
       catch (error) {
+        const authError = error as AuthApiError
+        if (authError?.code === 'ACCOUNT_SUSPENDED' || authError?.message?.includes('suspended')) {
+          this.clearAuth()
+          this.setSessionExpiryCode('ACCOUNT_SUSPENDED')
+        }
         const message = error instanceof Error ? error.message : ''
         if (message.includes('New browser or device detected')) {
           this.pendingLoginCodeEmail = credentials.email

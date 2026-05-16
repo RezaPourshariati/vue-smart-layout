@@ -2,9 +2,11 @@ import type { Response } from 'express'
 import type { AuthRequest, AutomatedEmailData } from '../../types/auth.js'
 import asyncHandler from 'express-async-handler'
 import { BadRequestError, NotFoundError } from '../../common/errors/app-error.js'
+import { emitAuthEvent } from '../../common/observability/auth-events.js'
 import sendEmail from '../../common/utils/sendEmail.js'
 import { config } from '../../config/env.js'
 import User from '../../models/user.model.js'
+import { revokeAllUserSessions } from '../../services/auth-session.service.js'
 
 export const getUser = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
   const user = await User.findById(req.user?._id).select('-password')
@@ -43,8 +45,19 @@ export const upgradeUser = asyncHandler(async (req: AuthRequest, res: Response):
   const user = await User.findById(id)
   if (!user)
     throw new NotFoundError('User not found!')
+  const previousRole = user.role
   user.role = role
   await user.save()
+
+  if (role === 'suspended' && previousRole !== 'suspended') {
+    const sessionsRevoked = await revokeAllUserSessions(user._id)
+    emitAuthEvent(req, 'auth.sessions_revoked', {
+      targetUserId: String(user._id),
+      reason: 'role_suspended',
+      sessionsRevoked,
+    })
+  }
+
   res.status(200).json({ message: `User role updated to ${role}` })
 })
 

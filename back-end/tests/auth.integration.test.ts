@@ -125,6 +125,63 @@ describe('auth integration', () => {
     expect(bad.status).toBe(401)
   })
 
+  it('login returns 403 for suspended user without setting session', async () => {
+    const agent = request.agent(app).set('User-Agent', TEST_UA)
+    await agent.post('/api/auth/register').send({
+      name: 'Suspended User',
+      email: 'suspended@example.com',
+      password: 'password12',
+    })
+    await User.updateOne({ email: 'suspended@example.com' }, { role: 'suspended' })
+
+    const login = await agent.post('/api/auth/login').send({
+      email: 'suspended@example.com',
+      password: 'password12',
+    })
+    expect(login.status).toBe(403)
+    expect(login.body.code).toBe('ACCOUNT_SUSPENDED')
+
+    const status = await agent.get('/api/auth/status')
+    expect(status.body).toBe(false)
+  })
+
+  it('upgradeUser to suspended revokes all sessions immediately', async () => {
+    const victim = request.agent(app).set('User-Agent', TEST_UA)
+    await victim.post('/api/auth/register').send({
+      name: 'Victim',
+      email: 'victim@example.com',
+      password: 'password12',
+    })
+    const victimUser = await User.findOne({ email: 'victim@example.com' })
+    expect(victimUser).toBeTruthy()
+    expect(await Session.countDocuments({ userId: victimUser!._id })).toBe(1)
+
+    const admin = request.agent(app).set('User-Agent', TEST_UA)
+    const adminReg = await admin.post('/api/auth/register').send({
+      name: 'Admin',
+      email: 'admin-suspend@example.com',
+      password: 'password12',
+    })
+    expect(adminReg.status).toBe(201)
+    await User.updateOne({ email: 'admin-suspend@example.com' }, { role: 'admin' })
+    const adminCsrf = cookieValueFromSetCookies(setCookieHeaders(adminReg), 'csrfToken')
+    expect(adminCsrf).toBeTruthy()
+
+    const upgrade = await admin
+      .post('/api/users/upgradeUser')
+      .set('x-csrf-token', adminCsrf!)
+      .send({ id: victimUser!._id.toString(), role: 'suspended' })
+    expect(upgrade.status).toBe(200)
+
+    expect(await Session.countDocuments({ userId: victimUser!._id })).toBe(0)
+
+    const refresh = await victim.post('/api/auth/refresh')
+    expect(refresh.status).toBe(401)
+
+    const profile = await victim.get('/api/users/me')
+    expect(profile.status).toBe(401)
+  })
+
   it('login succeeds with same trusted device as register', async () => {
     const agent = request.agent(app).set('User-Agent', TEST_UA)
     await agent.post('/api/auth/register').send({

@@ -38,6 +38,7 @@ import {
 } from '../../services/auth-token-records.service.js'
 import { getSessionExpiryCode } from '../../services/session-policy.service.js'
 import { generateToken, hashToken } from '../../services/token.service.js'
+import { assertUserNotSuspended } from '../../services/user-policy.service.js'
 
 function getCryptr(): Cryptr {
   if (!config.cryptrKey)
@@ -75,6 +76,8 @@ export const loginUser = asyncHandler(async (req: AuthRequest, res: Response): P
   const passwordIsCorrect = await bcrypt.compare(password, user.password)
   if (!passwordIsCorrect)
     throw new UnauthorizedError('Invalid email or password')
+
+  assertUserNotSuspended(user)
 
   const currentDevice = trustedDeviceFromRequest(req)
   const allowedDevice = userHasTrustedDevice(user.userAgent, currentDevice)
@@ -141,8 +144,7 @@ export const refreshSession = asyncHandler(async (req: AuthRequest, res: Respons
     const user = await User.findById(verified.userId)
     if (!user)
       throw new UnauthorizedError('Not authorized, please login')
-    if (user.role === 'suspended')
-      throw new ForbiddenError('User suspended, please contact support')
+    assertUserNotSuspended(user)
 
     const { refreshToken: nextRefreshToken, sid } = await rotateExistingSession(userToken, user._id)
     const accessToken = generateToken(user._id, sid)
@@ -196,6 +198,18 @@ export const loginStatus = asyncHandler(async (req: AuthRequest, res: Response):
       source: 'loginStatus',
     })
     throw new UnauthorizedError('Session expired, please login again', sessionExpiryCode)
+  }
+
+  const user = await User.findById(verified.id).select('role')
+  if (!user) {
+    res.json(false)
+    return
+  }
+  if (user.role === 'suspended') {
+    await activeSession.deleteOne()
+    clearAuthCookies(res)
+    res.json(false)
+    return
   }
 
   res.json(true)
@@ -300,6 +314,7 @@ export const sendLoginCode = asyncHandler(async (req: AuthRequest, res: Response
   const user = await User.findOne({ email })
   if (!user)
     throw new NotFoundError('User not found')
+  assertUserNotSuspended(user)
   const userToken = await findValidLoginCodeRecord(user._id)
   if (!userToken)
     throw new UnauthorizedError('Invalid or Expired Token, please login again')
@@ -326,6 +341,7 @@ export const loginWithCode = asyncHandler(async (req: AuthRequest, res: Response
   const user = await User.findOne({ email })
   if (!user)
     throw new NotFoundError('User not found')
+  assertUserNotSuspended(user)
   const userToken = await findValidLoginCodeRecord(user._id)
   if (!userToken)
     throw new UnauthorizedError('Invalid or Expired Token, please login again')
@@ -354,6 +370,8 @@ export const loginWithGoogle = asyncHandler(async (req: AuthRequest, res: Respon
   let user = await User.findOne({ email })
   if (!user)
     user = await User.create({ name, email, password, photo: picture, isVerified: true, userAgent: [initialDevice] })
+  else
+    assertUserNotSuspended(user)
   const { accessToken, refreshToken } = await createFreshSessionTokens(user._id)
   setAuthCookies(res, accessToken, refreshToken)
   res.status(201).json(user)

@@ -13,8 +13,14 @@ export async function issueRefreshTokenForUser(userId: SessionUserId): Promise<{
   return { refreshToken, refreshTokenRaw }
 }
 
+/** Removes every server-side session for the user (refresh chain + access `sid` binding). */
+export async function revokeAllUserSessions(userId: SessionUserId): Promise<number> {
+  const result = await Session.deleteMany({ userId })
+  return result.deletedCount
+}
+
 export async function replaceUserSession(userId: SessionUserId, refreshTokenRaw: string): Promise<string> {
-  await Session.deleteMany({ userId })
+  await revokeAllUserSessions(userId)
   const sessionTimestamps = buildSessionTimestamps()
   const createdSession = await new Session({
     userId,

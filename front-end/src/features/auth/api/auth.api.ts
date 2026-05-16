@@ -5,11 +5,13 @@ import type {
   RegisterPayload,
 } from '@/types'
 import { AUTH_API_BASE, createApiClient } from '@/shared/api/api-client'
-import { refreshSession } from './auth-session.api'
 
-export { refreshSession }
+export { refreshSession } from './auth-session.api'
 
-export type AuthApiErrorCode = 'SESSION_IDLE_EXPIRED' | 'SESSION_ABSOLUTE_EXPIRED'
+export type AuthApiErrorCode
+  = | 'SESSION_IDLE_EXPIRED'
+    | 'SESSION_ABSOLUTE_EXPIRED'
+    | 'ACCOUNT_SUSPENDED'
 
 export class AuthApiError extends Error {
   code?: AuthApiErrorCode
@@ -43,8 +45,13 @@ async function request<T>(
     const message = error instanceof Error ? error.message : 'Authentication request failed'
     const authError = new AuthApiError(message)
     const code = (error as Error & { code?: string }).code
-    if (code === 'SESSION_IDLE_EXPIRED' || code === 'SESSION_ABSOLUTE_EXPIRED')
+    if (
+      code === 'SESSION_IDLE_EXPIRED'
+      || code === 'SESSION_ABSOLUTE_EXPIRED'
+      || code === 'ACCOUNT_SUSPENDED'
+    ) {
       authError.code = code
+    }
     throw authError
   }
 }
