@@ -11,7 +11,7 @@ import { hashRefreshToken } from '../src/services/token.service.js'
  *   pnpm migrate:tokens              # apply
  *   pnpm migrate:tokens -- --dry-run # preview counts only
  *
- * Also re-hashes any `sessions` rows that still store a plaintext refresh secret
+ * Also, re-hashes any `sessions` rows that still store a plaintext refresh secret
  * (length > 64 hex chars — SHA-256 digests are exactly 64).
  */
 import 'dotenv/config'

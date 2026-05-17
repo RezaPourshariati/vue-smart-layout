@@ -10,7 +10,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "migrate:tokens": "tsx scripts/migrate-legacy-tokens.ts",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "lint": "eslint src tests scripts",
+    "lint:fix": "eslint src tests scripts --fix"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
@@ -30,6 +32,8 @@
     "ua-parser-js": "^2.0.6"
   },
   "devDependencies": {
+    "@adaptive-auth/config-typescript": "workspace:*",
+    "@adaptive-auth/eslint-config": "workspace:*",
     "@types/bcryptjs": "^2.4.6",
     "@types/cookie-parser": "^1.4.9",
     "@types/cors": "^2.8.19",

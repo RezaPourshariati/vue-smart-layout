@@ -1,0 +1,16 @@
+{
+  "name": "@adaptive-auth/config-typescript",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Shared TypeScript compiler presets for AdaptiveAuth workspace packages",
+  "exports": {
+    "./base": "./base.json",
+    "./vue-dom": "./vue-dom.json",
+    "./node-vite": "./node-vite.json",
+    "./node-service": "./node-service.json"
+  },
+  "dependencies": {
+    "@tsconfig/node22": "^22.0.5",
+    "@vue/tsconfig": "^0.9.1"
+  }
+}

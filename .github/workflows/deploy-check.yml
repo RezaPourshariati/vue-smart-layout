@@ -10,7 +10,7 @@ on:
       - 'pnpm-lock.yaml'
       - 'pnpm-workspace.yaml'
       - 'tsconfig.json'
-      - 'tsconfig.base.json'
+      - 'packages/**'
       - 'eslint.config.mjs'
       - 'uno.config.ts'
       - '.github/workflows/**'

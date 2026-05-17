@@ -1,16 +1,7 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "@adaptive-auth/config-typescript/node-service",
   "compilerOptions": {
-    "target": "ES2022",
-    "rootDir": "src",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "types": ["node"],
-    "allowJs": true,
-    "outDir": "dist",
-    "preserveConstEnums": true,
-    "removeComments": true,
-    "sourceMap": false
+    "rootDir": "src"
   },
   "include": ["src/**/*"],
   "exclude": [

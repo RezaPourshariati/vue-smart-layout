@@ -2,13 +2,12 @@
 
 AdaptiveAuth is a full-stack adaptive authentication starter organized as a pnpm monorepo.
 
-> **Local folder** may still be named `vue-smart-layout` (Cursor workspace). The **git remote** and product name are **AdaptiveAuth** (`adaptive-auth`).
-
 ## Project structure
 
 - `apps/vue-app` — Vue + Vite SPA
 - `services/auth-server` — Express + TypeScript API
-- `packages/` — shared libraries (Phase B+)
+- `packages/config-typescript` — shared TS presets (`base`, `vue-dom`, `node-vite`, `node-service`)
+- `packages/eslint-config` — shared ESLint flat configs (`vue`, `node`)
 - root — workspace orchestration, shared lint/TS config, CI
 
 ## Prerequisites
