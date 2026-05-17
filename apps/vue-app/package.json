@@ -28,6 +28,8 @@
   "devDependencies": {
     "@adaptive-auth/config-typescript": "workspace:*",
     "@adaptive-auth/eslint-config": "workspace:*",
+    "@adaptive-auth/shared-auth": "workspace:*",
+    "@adaptive-auth/shared-types": "workspace:*",
     "@playwright/test": "^1.60.0",
     "@types/node": "^25.6.2",
     "@vitejs/plugin-vue": "^6.0.6",

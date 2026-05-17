@@ -1,33 +1,14 @@
-import { refreshSession } from '@/features/auth/api/auth-session.api'
+import type { HttpClientOptions } from './types.js'
 
-function resolveApiRoot(): string {
-  const explicit = import.meta.env.VITE_API_ROOT_URL?.replace(/\/$/, '')
-  if (explicit)
-    return explicit
-  const legacyAuth = import.meta.env.VITE_API_BASE_URL
-  if (legacyAuth)
-    return legacyAuth.replace(/\/api\/auth\/?$/, '')
-  return 'http://localhost:4000'
-}
+export type HttpRequest = <T>(
+  path: string,
+  options?: RequestInit,
+  canRetryWithRefresh?: boolean,
+) => Promise<T>
 
-export const API_ROOT = resolveApiRoot()
-export const AUTH_API_BASE = `${API_ROOT}/api/auth`
-export const USERS_API_BASE = `${API_ROOT}/api/users`
+export function createHttpClient(httpClientOptions: HttpClientOptions): HttpRequest {
+  const { baseUrl, getCookie, refreshSession, skipRefreshRetryPaths } = httpClientOptions
 
-export function getCookie(name: string): string | null {
-  const pattern = new RegExp(`(?:^|; )${name}=([^;]*)`)
-  const match = document.cookie.match(pattern)
-  if (!match || match.length < 2)
-    return null
-  return decodeURIComponent(match[1] || '')
-}
-
-export interface ApiClientOptions {
-  baseUrl: string
-  skipRefreshRetryPaths: Set<string>
-}
-
-export function createApiClient({ baseUrl, skipRefreshRetryPaths }: ApiClientOptions) {
   return async function request<T>(
     path: string,
     options?: RequestInit,

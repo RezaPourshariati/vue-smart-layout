@@ -1,4 +1,4 @@
-import type { AuthApiError, AuthApiErrorCode } from '../api/auth.api'
+import type { AuthApiError, AuthApiErrorCode } from '@adaptive-auth/shared-auth'
 import type {
   AuthCredentials,
   AuthUser,
@@ -6,9 +6,10 @@ import type {
   RegisterPayload,
   UpdateProfilePayload,
 } from '@/types'
+import { bootstrapSession } from '@adaptive-auth/shared-auth'
 import { defineStore } from 'pinia'
 import * as usersService from '@/features/users/api/users.api'
-import * as authService from '../api/auth.api'
+import { auth, refreshSession } from '../api/auth.api'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -66,30 +67,17 @@ export const useAuthStore = defineStore('auth', {
 
       this.bootstrapLoading = true
       try {
-        try {
-          await authService.refreshSession()
-          const refreshedUser = await usersService.getCurrentUser()
-          this.setUser(refreshedUser)
-          this.clearSessionExpiryCode()
+        const { user, sessionExpiryCode } = await bootstrapSession({
+          refreshSession,
+          getLoginStatus: auth.getLoginStatus,
+          getCurrentUser: usersService.getCurrentUser,
+        })
+        if (sessionExpiryCode) {
+          this.setSessionExpiryCode(sessionExpiryCode)
+          this.clearAuth()
           return
         }
-        catch (error) {
-          const authError = error as AuthApiError
-          if (authError?.code) {
-            this.setSessionExpiryCode(authError.code)
-            this.clearAuth()
-            return
-          }
-          if (authError?.message?.includes('suspended')) {
-            this.setSessionExpiryCode('ACCOUNT_SUSPENDED')
-            this.clearAuth()
-            return
-          }
-        }
-
-        const isLoggedIn = await authService.getLoginStatus()
-        if (isLoggedIn) {
-          const user = await usersService.getCurrentUser()
+        if (user) {
           this.setUser(user)
           this.clearSessionExpiryCode()
         }
@@ -108,7 +96,7 @@ export const useAuthStore = defineStore('auth', {
     async login(credentials: AuthCredentials) {
       this.sessionLoading = true
       try {
-        const user = await authService.login(credentials)
+        const user = await auth.login(credentials)
         this.setUser(user)
         this.clearSessionExpiryCode()
         this.pendingLoginCodeEmail = ''
@@ -132,7 +120,7 @@ export const useAuthStore = defineStore('auth', {
     async register(payload: RegisterPayload) {
       this.sessionLoading = true
       try {
-        const user = await authService.register(payload)
+        const user = await auth.register(payload)
         this.setUser(user)
         this.clearSessionExpiryCode()
       }
@@ -143,7 +131,7 @@ export const useAuthStore = defineStore('auth', {
     async sendLoginCode(email: string) {
       this.sessionLoading = true
       try {
-        await authService.sendLoginCode(email)
+        await auth.sendLoginCode(email)
       }
       finally {
         this.sessionLoading = false
@@ -152,7 +140,7 @@ export const useAuthStore = defineStore('auth', {
     async loginWithCode(email: string, loginCode: string) {
       this.sessionLoading = true
       try {
-        const user = await authService.loginWithCode(email, loginCode)
+        const user = await auth.loginWithCode(email, loginCode)
         this.setUser(user)
         this.clearSessionExpiryCode()
         this.pendingLoginCodeEmail = ''
@@ -164,7 +152,7 @@ export const useAuthStore = defineStore('auth', {
     async forgotPassword(email: string) {
       this.accountLoading = true
       try {
-        return await authService.forgotPassword(email)
+        return await auth.forgotPassword(email)
       }
       finally {
         this.accountLoading = false
@@ -173,7 +161,7 @@ export const useAuthStore = defineStore('auth', {
     async resetPassword(resetToken: string, password: string) {
       this.accountLoading = true
       try {
-        return await authService.resetPassword(resetToken, password)
+        return await auth.resetPassword(resetToken, password)
       }
       finally {
         this.accountLoading = false
@@ -193,7 +181,7 @@ export const useAuthStore = defineStore('auth', {
     async sendVerificationEmail() {
       this.accountLoading = true
       try {
-        return await authService.sendVerificationEmail()
+        return await auth.sendVerificationEmail()
       }
       finally {
         this.accountLoading = false
@@ -202,7 +190,7 @@ export const useAuthStore = defineStore('auth', {
     async verifyUser(verificationToken: string) {
       this.accountLoading = true
       try {
-        return await authService.verifyUser(verificationToken)
+        return await auth.verifyUser(verificationToken)
       }
       finally {
         this.accountLoading = false
@@ -211,7 +199,7 @@ export const useAuthStore = defineStore('auth', {
     async changePassword(payload: ChangePasswordPayload) {
       this.accountLoading = true
       try {
-        return await authService.changePassword(payload)
+        return await auth.changePassword(payload)
       }
       finally {
         this.accountLoading = false
@@ -220,7 +208,7 @@ export const useAuthStore = defineStore('auth', {
     async logout() {
       this.sessionLoading = true
       try {
-        await authService.logout()
+        await auth.logout()
       }
       finally {
         this.clearAuth()

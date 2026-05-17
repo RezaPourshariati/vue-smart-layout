@@ -10,7 +10,6 @@ function makeTo(partial: Partial<RouteLocationNormalized> & { path: string, full
     hash: '',
     matched: [],
     redirectedFrom: undefined,
-    meta: {},
     ...partial,
   } as RouteLocationNormalized
 }

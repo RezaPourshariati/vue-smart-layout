@@ -38,3 +38,7 @@ export interface UpgradeUserPayload {
   id: string
   role: UserRole
 }
+
+export interface ApiMessageResponse {
+  message: string
+}

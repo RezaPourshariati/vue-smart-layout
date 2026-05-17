@@ -7,4 +7,4 @@ export type {
   UpdateProfilePayload,
   UpgradeUserPayload,
   UserRole,
-} from '@adaptive-auth/shared-types'
+} from './auth.js'

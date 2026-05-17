@@ -1,3 +1,4 @@
+import type { UserRole } from '@adaptive-auth/shared-types'
 import type { Request } from 'express'
 import type { Document, Types } from 'mongoose'
 import type { TrustedDeviceSnapshot } from './device.js'
@@ -10,7 +11,7 @@ export interface IUser extends Document {
   photo: string
   phone: string
   bio: string
-  role: 'subscriber' | 'author' | 'admin' | 'suspended'
+  role: UserRole
   isVerified: boolean
   userAgent: TrustedDeviceSnapshot[]
   createdAt: Date

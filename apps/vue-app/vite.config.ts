@@ -16,4 +16,7 @@ export default defineConfig(({ mode }) => ({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  optimizeDeps: {
+    include: ['@adaptive-auth/shared-auth', '@adaptive-auth/shared-types'],
+  },
 }))

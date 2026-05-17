@@ -1,3 +1,4 @@
+import type { UpgradeUserPayload } from '@adaptive-auth/shared-types'
 import type { Response } from 'express'
 import type { AuthRequest, AutomatedEmailData } from '../../types/auth.js'
 import asyncHandler from 'express-async-handler'
@@ -41,7 +42,7 @@ export const getUsers = asyncHandler(async (_req: AuthRequest, res: Response): P
 })
 
 export const upgradeUser = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
-  const { id, role } = req.body as { id: string, role: 'subscriber' | 'author' | 'admin' | 'suspended' }
+  const { id, role } = req.body as UpgradeUserPayload
   const user = await User.findById(id)
   if (!user)
     throw new NotFoundError('User not found!')

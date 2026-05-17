@@ -8,6 +8,8 @@ AdaptiveAuth is a full-stack adaptive authentication starter organized as a pnpm
 - `services/auth-server` — Express + TypeScript API
 - `packages/config-typescript` — shared TS presets (`base`, `vue-dom`, `node-vite`, `node-service`)
 - `packages/eslint-config` — shared ESLint flat configs (`vue`, `node`)
+- `packages/shared-types` — API contracts and DTOs (`AuthUser`, payloads, `UserRole`, …)
+- `packages/shared-auth` — browser auth HTTP client, refresh, CSRF, `bootstrapSession` (`@adaptive-auth/shared-auth/browser`)
 - root — workspace orchestration, shared lint/TS config, CI
 
 ## Prerequisites
@@ -56,7 +58,10 @@ pnpm test:e2e
 
 ## Build
 
+Shared libraries must be built before apps (root `build` does this automatically):
+
 ```sh
+pnpm build:packages
 pnpm build:vue-app
 pnpm build:auth-server
 pnpm build
