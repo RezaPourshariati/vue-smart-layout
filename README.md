@@ -44,15 +44,12 @@ pnpm dev:vue-app
 pnpm dev:auth-server
 ```
 
-Legacy script aliases `dev:front-end` and `dev:back-end` still work.
-
 ## Quality checks
 
 ```sh
 pnpm lint
 pnpm type-check
-pnpm test:vue-app
-pnpm test:auth-server
+pnpm test
 pnpm test:e2e
 ```
 

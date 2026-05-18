@@ -35,6 +35,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Build workspace packages
+        run: pnpm build:packages
+
       - name: Lint vue-app
         run: pnpm lint:vue-app
 
@@ -62,8 +65,14 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Build workspace packages
+        run: pnpm build:packages
+
       - name: Lint auth-server
         run: pnpm lint:auth-server
+
+      - name: Type check auth-server
+        run: pnpm type-check:auth-server
 
       - name: Build auth-server
         run: pnpm build:auth-server
